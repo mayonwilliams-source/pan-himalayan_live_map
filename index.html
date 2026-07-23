@@ -366,6 +366,200 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+// ─────────────────────────────────────────────
+// POSITION ENGINE
+// ─────────────────────────────────────────────
+
+// Haversine distance in nautical miles
+function haversineNmi(lat1, lon1, lat2, lon2) {
+  const R    = 3440.065; // Earth radius in nmi
+  const phi1 = lat1 * Math.PI/180;
+  const phi2 = lat2 * Math.PI/180;
+  const dphi = (lat2-lat1) * Math.PI/180;
+  const dlam = (lon2-lon1) * Math.PI/180;
+  const a    = Math.sin(dphi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dlam/2)**2;
+  const c    = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Interpolate position along great circle (t = 0 to 1)
+function greatCircleInterp(lat1, lon1, lat2, lon2, t) {
+  const toRad = d => d * Math.PI/180;
+  const toDeg = r => r * 180/Math.PI;
+  const φ1 = toRad(lat1), λ1 = toRad(lon1);
+  const φ2 = toRad(lat2), λ2 = toRad(lon2);
+  const d  = 2 * Math.asin(Math.sqrt(
+    Math.sin((φ2-φ1)/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2
+  ));
+  if (d < 1e-10) return { lat: lat1, lon: lon1 };
+  const A  = Math.sin((1-t)*d) / Math.sin(d);
+  const B  = Math.sin(t*d)     / Math.sin(d);
+  const x  = A*Math.cos(φ1)*Math.cos(λ1) + B*Math.cos(φ2)*Math.cos(λ2);
+  const y  = A*Math.cos(φ1)*Math.sin(λ1) + B*Math.cos(φ2)*Math.sin(λ2);
+  const z  = A*Math.sin(φ1)              + B*Math.sin(φ2);
+  return {
+    lat: toDeg(Math.atan2(z, Math.sqrt(x*x + y*y))),
+    lon: toDeg(Math.atan2(y, x)),
+  };
+}
+
+// Bearing from point 1 to point 2 (degrees)
+function bearing(lat1, lon1, lat2, lon2) {
+  const toRad = d => d * Math.PI/180;
+  const φ1 = toRad(lat1), φ2 = toRad(lat2);
+  const Δλ = toRad(lon2 - lon1);
+  const y  = Math.sin(Δλ) * Math.cos(φ2);
+  const x  = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
+  return (Math.atan2(y, x) * 180/Math.PI + 360) % 360;
+}
+
+// Parse "hh:mm" or "hh:mm:ss" duration string to hours (handles >24h)
+function parseDuration(str) {
+  if (!str) return 0;
+  const parts = String(str).split(':').map(Number);
+  return parts[0] + (parts[1]||0)/60 + (parts[2]||0)/3600;
+}
+
+// Parse "hh:mm" time string to fractional hours since midnight
+function parseTime(str) {
+  if (!str) return 6; // default 06:00
+  const parts = String(str).split(':').map(Number);
+  return parts[0] + (parts[1]||0)/60;
+}
+
+// Map aircraft type string to column group key
+function getAircraftGroup(typeStr) {
+  if (!typeStr) return null;
+  const t = typeStr.toLowerCase();
+  if (t.includes('a320neo') || t.includes('a20n')) return 'A20N';
+  if (t.includes('a320'))                           return 'A320';
+  if (t.includes('a319neo') || t.includes('a19n')) return 'A19N';
+  if (t.includes('a319'))                           return 'A319';
+  if (t.includes('atr') || t.includes('at46'))     return 'AT46';
+  return null;
+}
+
+// Days of week mapping (JS getDay: 0=Sun,1=Mon,...,6=Sat)
+const DAY_COLS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+// Maps to schedule columns D-J (index 0=Mon...6=Sun in the sheet)
+const SHEET_DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+// Given current UTC time, compute position of one aircraft
+// Returns { lat, lon, bearing, status, fromIATA, toIATA, depTime, arrTime, legProgress }
+function computePosition(ac, route, airports, nowUTC) {
+  const hubICAO  = ac.homeBase;
+  const tzOffset = HUB_TZ[hubICAO] || 345; // minutes from UTC
+  const nowLocal = new Date(nowUTC.getTime() + tzOffset * 60000);
+
+  // Current local time in fractional hours since midnight
+  const localHrs = nowLocal.getUTCHours() + nowLocal.getUTCMinutes()/60 + nowLocal.getUTCSeconds()/3600;
+
+  // Day of week in local time (SHEET_DAY_ORDER index 0=Mon)
+  const jsDow    = nowLocal.getUTCDay(); // 0=Sun
+  const sheetDow = jsDow === 0 ? 6 : jsDow - 1; // 0=Mon...6=Sun
+
+  // Get today's destination sequence
+  const destStr  = ac.schedule[sheetDow];
+  if (!destStr) return { status: 'ground', lat: null, lon: null, hubICAO };
+
+  // Parse destinations
+  const dests    = destStr.split(',').map(s => s.trim()).filter(Boolean);
+  if (!dests.length) return { status: 'ground', lat: null, lon: null, hubICAO };
+
+  // Start time in local fractional hours
+  const startHrs = route.startTime !== null ? route.startTime : 6.0;
+
+  // Speed in kts, turnaround in hours
+  const speedKts    = ac.speed || 447;
+  const turnaround  = parseDuration(ac.turnaround); // hours
+
+  // Hub airport coords
+  const hubAp = airports[hubICAO] || Object.values(airports).find(a => a.iata === ac.homeBaseIATA);
+  if (!hubAp) return { status: 'ground', lat: null, lon: null, hubICAO };
+
+  // Build legs array: each leg is { fromICAO, toICAO, deptHrs, arrHrs }
+  const legs   = [];
+  let   cursor = startHrs;
+
+  for (let i = 0; i < dests.length; i++) {
+    const destIATA = dests[i];
+    const destAp   = Object.values(airports).find(a => a.iata === destIATA);
+    if (!destAp) continue;
+
+    // Outbound: hub → dest
+    const distOut  = haversineNmi(hubAp.lat, hubAp.lon, destAp.lat, destAp.lon);
+    const ftOut    = distOut / speedKts + 0.5; // hours, 30min fudge
+    legs.push({
+      fromIATA: hubAp.iata, toIATA: destIATA,
+      fromLat: hubAp.lat, fromLon: hubAp.lon,
+      toLat: destAp.lat, toLon: destAp.lon,
+      deptHrs: cursor, arrHrs: cursor + ftOut,
+    });
+    cursor += ftOut + turnaround; // turnaround at destination
+
+    // Inbound: dest → hub
+    const ftIn = ftOut; // same distance
+    legs.push({
+      fromIATA: destIATA, toIATA: hubAp.iata,
+      fromLat: destAp.lat, fromLon: destAp.lon,
+      toLat: hubAp.lat, toLon: hubAp.lon,
+      deptHrs: cursor, arrHrs: cursor + ftIn,
+    });
+    cursor += ftIn;
+
+    // Turnaround at hub before next dest (except after last)
+    if (i < dests.length - 1) cursor += turnaround;
+  }
+
+  // Find which leg we're currently on
+  if (localHrs < startHrs) {
+    return { status: 'ground', lat: hubAp.lat, lon: hubAp.lon, hubICAO, hubIATA: hubAp.iata };
+  }
+
+  for (const leg of legs) {
+    if (localHrs >= leg.deptHrs && localHrs < leg.arrHrs) {
+      const t   = (localHrs - leg.deptHrs) / (leg.arrHrs - leg.deptHrs);
+      const pos = greatCircleInterp(leg.fromLat, leg.fromLon, leg.toLat, leg.toLon, t);
+      const hdg = bearing(leg.fromLat, leg.fromLon, leg.toLat, leg.toLon);
+      return {
+        status:      'airborne',
+        lat:         pos.lat,
+        lon:         pos.lon,
+        heading:     hdg,
+        fromIATA:    leg.fromIATA,
+        toIATA:      leg.toIATA,
+        deptHrs:     leg.deptHrs,
+        arrHrs:      leg.arrHrs,
+        legProgress: t,
+        hubICAO,
+      };
+    }
+
+    // Between legs (on ground at intermediate point)
+    const legIdx = legs.indexOf(leg);
+    if (legIdx < legs.length - 1) {
+      const next = legs[legIdx + 1];
+      if (localHrs >= leg.arrHrs && localHrs < next.deptHrs) {
+        // On ground at leg arrival airport
+        return {
+          status:   'ground',
+          lat:      leg.toLat,
+          lon:      leg.toLon,
+          atIATA:   leg.toIATA,
+          hubICAO,
+        };
+      }
+    }
+  }
+
+  // After all legs complete — back at hub
+  return { status: 'ground', lat: hubAp.lat, lon: hubAp.lon, hubICAO, hubIATA: hubAp.iata };
+}
+</script>
+
+
 <script>
 // ─────────────────────────────────────────────
 // CONFIG
