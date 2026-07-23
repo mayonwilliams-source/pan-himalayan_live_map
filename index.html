@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pan-Himalayan Airlines — Live Fleet Map</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a0a0f;
+      color: #c7c9d3;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 48px;
+      background: #12121a;
+      border-bottom: 1px solid #2a2a3a;
+      flex-shrink: 0;
+      z-index: 1000;
+    }
+
+    #topbar .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #topbar .brand span {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+
+    #topbar .brand .accent {
+      color: #5c158a;
+    }
+
+    #clock-block {
+      display: flex;
+      gap: 24px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    #clock-block .tz {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    #clock-block .tz .label {
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    #clock-block .tz .time {
+      font-size: 13px;
+      font-weight: 600;
+      color: #c7c9d3;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #fleet-count {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* ── Main layout ── */
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Map ── */
+    #map {
+      flex: 1;
+      background: #0d1117;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 280px;
+      background: #12121a;
+      border-left: 1px solid #2a2a3a;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    #sidebar h2 {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #555;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #1e1e2e;
+    }
+
+    #fleet-list {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 0;
+    }
+
+    .fleet-item {
+      padding: 10px 16px;
+      border-bottom: 1px solid #1a1a26;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .fleet-item:hover { background: #1a1a2e; }
+
+    .fleet-item .reg {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .fleet-item .type {
+      font-size: 11px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .fleet-item .status {
+      font-size: 10px;
+      margin-top: 4px;
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .status-online    { background: #1a3a1a; color: #4caf50; }
+    .status-maintenance { background: #3a1a1a; color: #f44336; }
+    .status-waiting   { background: #2a2a1a; color: #ff9800; }
+    .status-delivered { background: #1a1a3a; color: #5c158a; }
+
+    /* ── Leaflet overrides ── */
+    .leaflet-container { background: #0d1117; }
+
+    .leaflet-tile {
+      filter: brightness(0.6) saturate(0.4) hue-rotate(200deg);
+    }
+
+    .leaflet-control-zoom a {
+      background: #12121a !important;
+      color: #c7c9d3 !important;
+      border-color: #2a2a3a !important;
+    }
+
+    .leaflet-control-attribution {
+      background: rgba(10,10,15,0.8) !important;
+      color: #444 !important;
+      font-size: 9px !important;
+    }
+
+    .leaflet-control-attribution a { color: #555 !important; }
+
+    /* Loading overlay */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      gap: 16px;
+    }
+
+    #loading .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    #loading .logo span { color: #5c158a; }
+
+    #loading .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #2a2a3a;
+      border-top-color: #5c158a;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    #loading .msg {
+      font-size: 12px;
+      color: #555;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loading">
+  <div class="logo">Pan-<span>Himalayan</span> Airlines</div>
+  <div class="spinner"></div>
+  <div class="msg" id="loading-msg">Initialising...</div>
+</div>
+
+<!-- Top bar -->
+<div id="topbar">
+  <div class="brand">
+    <span>Pan-<span class="accent">Himalayan</span> Airlines</span>
+    <span style="color:#2a2a3a">|</span>
+    <span style="color:#555; font-size:12px;">Live Fleet Map</span>
+  </div>
+  <div id="clock-block">
+    <div class="tz">
+      <div class="label">NPT</div>
+      <div class="time" id="clock-npt">--:--:--</div>
+    </div>
+    <div class="tz">
+      <div class="label">UTC</div>
+      <div class="time" id="clock-utc">--:--:--</div>
+    </div>
+    <div class="tz">
+      <div class="label">Local</div>
+      <div class="time" id="clock-local">--:--:--</div>
+    </div>
+  </div>
+  <div id="fleet-count">— aircraft</div>
+</div>
+
+<!-- Main -->
+<div id="main">
+  <div id="map"></div>
+  <div id="sidebar">
+    <h2>Fleet</h2>
+    <div id="fleet-list">
+      <div style="padding:20px; color:#444; font-size:12px;">Loading fleet data...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────
+const SHEET_ID = '1Gn2t_5jhLf_gPHJN5ojSX270ImGtH2EYZi4HbwDgZJk';
+const SHEETS = {
+  fleet:    'Fleet Information',
+  airports: 'Airport Information',
+  routes:   'Routes Master List',
+  schedule: 'Aircraft Schedule',
+};
+
+function sheetUrl(sheetName) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+}
+
+// ─────────────────────────────────────────────
+// CLOCK
+// ─────────────────────────────────────────────
+function updateClocks() {
+  const now = new Date();
+
+  // NPT = UTC+5:45
+  const npt = new Date(now.getTime() + (5*60 + 45)*60*1000);
+  document.getElementById('clock-npt').textContent   = npt.toUTCString().slice(17,25);
+  document.getElementById('clock-utc').textContent   = now.toUTCString().slice(17,25);
+  document.getElementById('clock-local').textContent = now.toLocaleTimeString('en-GB');
+}
+setInterval(updateClocks, 1000);
+updateClocks();
+
+// ─────────────────────────────────────────────
+// MAP INIT
+// ─────────────────────────────────────────────
+const map = L.map('map', {
+  center: [27.5, 85],   // Centred on Nepal
+  zoom: 5,
+  zoomControl: true,
+  attributionControl: true,
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 18,
+}).addTo(map);
+
+// ─────────────────────────────────────────────
+// DATA FETCHING
+// ─────────────────────────────────────────────
+async function fetchSheet(sheetName) {
+  const url  = sheetUrl(sheetName);
+  const resp = await fetch(url);
+  const text = await resp.text();
+  // Google wraps response in /*O_o*/\ngoogle.visualization.Query.setResponse(...)
+  const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+  return json.table;
+}
+
+function tableToObjects(table) {
+  const headers = table.cols.map(c => c.label);
+  return table.rows
+    .filter(r => r && r.c && r.c.some(c => c && c.v !== null))
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => {
+        obj[h] = r.c[i] ? r.c[i].v : null;
+      });
+      return obj;
+    });
+}
+
+// ─────────────────────────────────────────────
+// STATUS HELPERS
+// ─────────────────────────────────────────────
+function statusClass(status) {
+  if (!status) return 'status-delivered';
+  const s = status.toLowerCase();
+  if (s.includes('service') || s === 'online') return 'status-online';
+  if (s.includes('maintenance'))               return 'status-maintenance';
+  if (s.includes('waiting'))                   return 'status-waiting';
+  return 'status-delivered';
+}
+
+function statusLabel(status) {
+  if (!status) return 'Delivered';
+  const s = status.toLowerCase();
+  if (s.includes('service') || s === 'online') return 'Online';
+  if (s.includes('maintenance'))               return 'Maintenance';
+  if (s.includes('waiting'))                   return 'Waiting';
+  return status;
+}
+
+// ─────────────────────────────────────────────
+// MAIN INIT
+// ─────────────────────────────────────────────
+async function init() {
+  try {
+    document.getElementById('loading-msg').textContent = 'Loading fleet data...';
+    const fleetTable = await fetchSheet(SHEETS.fleet);
+    const fleet      = tableToObjects(fleetTable)
+      .filter(r => r['Aircraft Type'] && r['Registration']);
+
+    // Populate sidebar
+    const listEl = document.getElementById('fleet-list');
+    listEl.innerHTML = '';
+    fleet.forEach(ac => {
+      const div = document.createElement('div');
+      div.className = 'fleet-item';
+      const sc = statusClass(ac['Status']);
+      const sl = statusLabel(ac['Status']);
+      div.innerHTML = `
+        <div class="reg">${ac['Registration']}</div>
+        <div class="type">${ac['Aircraft Type']} — ${ac['Home Base'] || '—'}</div>
+        <div class="status ${sc}">${sl}</div>
+      `;
+      listEl.appendChild(div);
+    });
+
+    document.getElementById('fleet-count').textContent =
+      `${fleet.length} aircraft`;
+
+    document.getElementById('loading-msg').textContent = 'Loading airports...';
+    const airportTable = await fetchSheet(SHEETS.airports);
+    const airports     = tableToObjects(airportTable)
+      .filter(r => r['IATA'] && r['Lat.'] && r['Lon']);
+
+    // Plot airport pins (placeholder style for now)
+    airports.forEach(ap => {
+      const marker = L.circleMarker([ap['Lat.'], ap['Lon']], {
+        radius: 5,
+        fillColor: '#5c158a',
+        color: '#c7c9d3',
+        weight: 1,
+        fillOpacity: 0.9,
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <b>${ap['IATA']}</b> — ${ap['Airport Name'] || ''}<br>
+        <span style="color:#888; font-size:11px;">${ap['ICAO'] || ''}</span>
+      `);
+    });
+
+    // Hide loading screen
+    document.getElementById('loading').style.display = 'none';
+
+  } catch (err) {
+    document.getElementById('loading-msg').textContent = 'Error loading data: ' + err.message;
+    console.error(err);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
