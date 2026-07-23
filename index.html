@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pan-Himalayan Airlines — Live Fleet Map</title>
@@ -20,9 +20,9 @@
       --copper:    #B87333;
       --juniper:   #4B5D43;
       --rose:      #8a345f;
-      --bg:        #0a0208;
-      --bg2:       #110a18;
-      --bg3:       #1a1025;
+      --bg:        #000000;
+      --bg2:       #000000;
+      --bg3:       #0a0208;       
       --border:    #2a1a3a;
     }
 
@@ -64,18 +64,19 @@
       letter-spacing: 1.5px;
       color: var(--mist);
     }
-
+   .brand-name {
+      color: var(--mist);
+    }
     .brand-name em {
-      color: var(--lilac);
-      font-style: normal;
+    color: var(--mist);
     }
 
     .brand-sub {
       font-size: 11px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--zanskar);
-      font-family: 'Cormorant Garamond', serif;
+      color: var(--lilac);
+      font-family: 'Marcellus SC', serif;
     }
 
     #clock-block {
@@ -94,7 +95,7 @@
       font-size: 9px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--zanskar);
+      color: var(--lilac);
     }
 
     .tz .time {
@@ -295,7 +296,7 @@
     }
 
     #loading .logo em {
-      color: var(--lilac);
+      color: var(--mist);
       font-style: normal;
     }
 
@@ -303,7 +304,7 @@
       font-size: 11px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--zanskar);
+      color: var(--lilac);
     }
 
     #loading .spinner {
