@@ -5,16 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pan-Himalayan Airlines — Live Fleet Map</title>
 
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --zanskar:   #5c158a;
+      --lilac:     #BFA2DC;
+      --marigold:  #F7B500;
+      --turquoise: #269473;
+      --red:       #D91E36;
+      --mist:      #c7c9d3;
+      --black:     #000000;
+      --copper:    #B87333;
+      --juniper:   #4B5D43;
+      --rose:      #8a345f;
+      --bg:        #0a0208;
+      --bg2:       #110a18;
+      --bg3:       #1a1025;
+      --border:    #2a1a3a;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #0a0a0f;
-      color: #c7c9d3;
+      font-family: 'Alegreya Sans', sans-serif;
+      background: var(--bg);
+      color: var(--mist);
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -26,62 +43,72 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
-      height: 48px;
-      background: #12121a;
-      border-bottom: 1px solid #2a2a3a;
+      padding: 0 24px;
+      height: 52px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
       flex-shrink: 0;
       z-index: 1000;
     }
 
-    #topbar .brand {
+    .brand {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      align-items: baseline;
+      gap: 12px;
     }
 
-    #topbar .brand span {
-      font-size: 15px;
+    .brand-name {
+      font-family: 'Marcellus SC', serif;
+      font-size: 18px;
       font-weight: 600;
-      letter-spacing: 0.5px;
-      color: #ffffff;
+      letter-spacing: 1.5px;
+      color: var(--mist);
     }
 
-    #topbar .brand .accent {
-      color: #5c158a;
+    .brand-name em {
+      color: var(--lilac);
+      font-style: normal;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--zanskar);
+      font-family: 'Cormorant Garamond', serif;
     }
 
     #clock-block {
       display: flex;
-      gap: 24px;
-      font-size: 12px;
-      color: #888;
+      gap: 28px;
     }
 
-    #clock-block .tz {
+    .tz {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1px;
     }
 
-    #clock-block .tz .label {
+    .tz .label {
       font-size: 9px;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: #555;
+      color: var(--zanskar);
     }
 
-    #clock-block .tz .time {
-      font-size: 13px;
+    .tz .time {
+      font-size: 15px;
       font-weight: 600;
-      color: #c7c9d3;
+      color: var(--mist);
       font-variant-numeric: tabular-nums;
+      letter-spacing: 1px;
     }
 
     #fleet-count {
       font-size: 12px;
-      color: #666;
+      color: #444;
+      letter-spacing: 1px;
     }
 
     /* ── Main layout ── */
@@ -94,127 +121,204 @@
     /* ── Map ── */
     #map {
       flex: 1;
-      background: #0d1117;
+      background: var(--bg);
     }
 
     /* ── Sidebar ── */
     #sidebar {
-      width: 280px;
-      background: #12121a;
-      border-left: 1px solid #2a2a3a;
+      width: 290px;
+      background: var(--bg2);
+      border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       flex-shrink: 0;
     }
 
-    #sidebar h2 {
+    .sidebar-header {
+      font-family: 'Marcellus SC', serif;
       font-size: 11px;
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: #555;
+      color: var(--zanskar);
       padding: 14px 16px 10px;
-      border-bottom: 1px solid #1e1e2e;
+      border-bottom: 1px solid var(--border);
     }
 
     #fleet-list {
       overflow-y: auto;
       flex: 1;
-      padding: 8px 0;
+      padding: 6px 0;
     }
+
+    #fleet-list::-webkit-scrollbar { width: 4px; }
+    #fleet-list::-webkit-scrollbar-track { background: var(--bg2); }
+    #fleet-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     .fleet-item {
       padding: 10px 16px;
-      border-bottom: 1px solid #1a1a26;
+      border-bottom: 1px solid var(--border);
       cursor: pointer;
       transition: background 0.15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
     }
 
-    .fleet-item:hover { background: #1a1a2e; }
+    .fleet-item:hover { background: var(--bg3); }
 
-    .fleet-item .reg {
-      font-size: 13px;
+    .fleet-item-left {}
+
+    .fleet-reg {
+      font-family: 'Marcellus SC', serif;
+      font-size: 14px;
       font-weight: 600;
-      color: #fff;
-      letter-spacing: 0.5px;
+      color: var(--mist);
+      letter-spacing: 1px;
     }
 
-    .fleet-item .type {
+    .fleet-type {
       font-size: 11px;
-      color: #666;
+      color: #554466;
       margin-top: 2px;
+      letter-spacing: 0.3px;
     }
 
-    .fleet-item .status {
-      font-size: 10px;
-      margin-top: 4px;
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
+    .fleet-base {
+      font-size: 11px;
+      color: var(--lilac);
+      margin-top: 2px;
+      opacity: 0.7;
+    }
+
+    .fleet-status {
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 2px;
       font-weight: 600;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+      white-space: nowrap;
     }
 
-    .status-online    { background: #1a3a1a; color: #4caf50; }
-    .status-maintenance { background: #3a1a1a; color: #f44336; }
-    .status-waiting   { background: #2a2a1a; color: #ff9800; }
-    .status-delivered { background: #1a1a3a; color: #5c158a; }
+    .status-online      { background: #0a2a0a; color: var(--turquoise); border: 1px solid #1a4a1a; }
+    .status-maintenance { background: #2a0a0a; color: var(--red);       border: 1px solid #4a1a1a; }
+    .status-waiting     { background: #2a1a00; color: var(--marigold);  border: 1px solid #4a3a00; }
+    .status-delivered   { background: #1a0a2a; color: var(--lilac);     border: 1px solid #2a1a3a; }
 
     /* ── Leaflet overrides ── */
-    .leaflet-container { background: #0d1117; }
+    .leaflet-container { background: var(--bg); }
 
     .leaflet-tile {
-      filter: brightness(0.6) saturate(0.4) hue-rotate(200deg);
+      filter: brightness(0.45) saturate(0.3) hue-rotate(210deg);
     }
 
     .leaflet-control-zoom a {
-      background: #12121a !important;
-      color: #c7c9d3 !important;
-      border-color: #2a2a3a !important;
+      background: var(--bg2) !important;
+      color: var(--mist) !important;
+      border-color: var(--border) !important;
+      font-family: 'Cormorant Garamond', serif !important;
+    }
+
+    .leaflet-control-zoom a:hover {
+      background: var(--bg3) !important;
     }
 
     .leaflet-control-attribution {
-      background: rgba(10,10,15,0.8) !important;
-      color: #444 !important;
+      background: rgba(10,2,8,0.85) !important;
+      color: #333 !important;
       font-size: 9px !important;
     }
 
-    .leaflet-control-attribution a { color: #555 !important; }
+    .leaflet-control-attribution a { color: #444 !important; }
+
+    .leaflet-popup-content-wrapper {
+      background: var(--bg2) !important;
+      color: var(--mist) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 4px !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
+      font-family: 'Cormorant Garamond', serif !important;
+    }
+
+    .leaflet-popup-tip {
+      background: var(--bg2) !important;
+    }
+
+    .leaflet-popup-content {
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 10px 14px !important;
+    }
+
+    .popup-iata {
+      font-family: 'Marcellus SC', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--lilac);
+      letter-spacing: 1px;
+    }
+
+    .popup-name {
+      font-size: 12px;
+      color: var(--mist);
+      margin-top: 1px;
+    }
+
+    .popup-icao {
+      font-size: 10px;
+      color: #554466;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
 
     /* Loading overlay */
     #loading {
       position: fixed;
       inset: 0;
-      background: #0a0a0f;
+      background: var(--bg);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      gap: 16px;
+      gap: 20px;
     }
 
     #loading .logo {
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 1px;
+      font-family: 'Marcellus SC', serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--mist);
+      letter-spacing: 2px;
     }
 
-    #loading .logo span { color: #5c158a; }
+    #loading .logo em {
+      color: var(--lilac);
+      font-style: normal;
+    }
+
+    #loading .tagline {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--zanskar);
+    }
 
     #loading .spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid #2a2a3a;
-      border-top-color: #5c158a;
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--border);
+      border-top-color: var(--zanskar);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.9s linear infinite;
     }
 
     #loading .msg {
       font-size: 12px;
-      color: #555;
+      color: #443355;
+      letter-spacing: 1px;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -222,19 +326,17 @@
 </head>
 <body>
 
-<!-- Loading screen -->
 <div id="loading">
-  <div class="logo">Pan-<span>Himalayan</span> Airlines</div>
+  <div class="logo">Pan-<em>Himalayan</em> Airlines</div>
+  <div class="tagline">Live Fleet Map</div>
   <div class="spinner"></div>
   <div class="msg" id="loading-msg">Initialising...</div>
 </div>
 
-<!-- Top bar -->
 <div id="topbar">
   <div class="brand">
-    <span>Pan-<span class="accent">Himalayan</span> Airlines</span>
-    <span style="color:#2a2a3a">|</span>
-    <span style="color:#555; font-size:12px;">Live Fleet Map</span>
+    <div class="brand-name">Pan-<em>Himalayan</em> Airlines</div>
+    <div class="brand-sub">Live Fleet Map</div>
   </div>
   <div id="clock-block">
     <div class="tz">
@@ -253,20 +355,17 @@
   <div id="fleet-count">— aircraft</div>
 </div>
 
-<!-- Main -->
 <div id="main">
   <div id="map"></div>
   <div id="sidebar">
-    <h2>Fleet</h2>
+    <div class="sidebar-header">Fleet</div>
     <div id="fleet-list">
-      <div style="padding:20px; color:#444; font-size:12px;">Loading fleet data...</div>
+      <div style="padding:20px; color:#443355; font-size:13px;">Loading fleet data...</div>
     </div>
   </div>
 </div>
 
-<!-- Leaflet JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
 <script>
 // ─────────────────────────────────────────────
 // CONFIG
@@ -279,33 +378,49 @@ const SHEETS = {
   schedule: 'Aircraft Schedule',
 };
 
-function sheetUrl(sheetName) {
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+// Timezone offsets from UTC in minutes
+const HUB_TZ = {
+  VNKT: 345,  // NPT  UTC+5:45
+  VQPR: 360,  // BTT  UTC+6:00
+  VEGT: 330,  // IST  UTC+5:30
+  ZULS: 480,  // CST  UTC+8:00
+  VNPR: 345,  // NPT  UTC+5:45
+  VNBW: 345,  // NPT  UTC+5:45
+  VILH: 330,  // IST  UTC+5:30 (Leh)
+  OPSD: 300,  // PST  UTC+5:00 (Skardu)
+};
+
+function sheetUrl(name) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;
 }
 
 // ─────────────────────────────────────────────
 // CLOCK
 // ─────────────────────────────────────────────
-function updateClocks() {
-  const now = new Date();
+function pad(n) { return String(n).padStart(2,'0'); }
 
-  // NPT = UTC+5:45
-  const npt = new Date(now.getTime() + (5*60 + 45)*60*1000);
-  document.getElementById('clock-npt').textContent   = npt.toUTCString().slice(17,25);
-  document.getElementById('clock-utc').textContent   = now.toUTCString().slice(17,25);
-  document.getElementById('clock-local').textContent = now.toLocaleTimeString('en-GB');
+function formatTime(date) {
+  return `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
+}
+
+function updateClocks() {
+  const now   = new Date();
+  const npt   = new Date(now.getTime() + 345*60*1000);
+  const local = now.toLocaleTimeString('en-GB');
+  document.getElementById('clock-npt').textContent   = formatTime(npt);
+  document.getElementById('clock-utc').textContent   = formatTime(now);
+  document.getElementById('clock-local').textContent = local;
 }
 setInterval(updateClocks, 1000);
 updateClocks();
 
 // ─────────────────────────────────────────────
-// MAP INIT
+// MAP
 // ─────────────────────────────────────────────
 const map = L.map('map', {
-  center: [27.5, 85],   // Centred on Nepal
+  center: [27.5, 87],
   zoom: 5,
   zoomControl: true,
-  attributionControl: true,
 });
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -316,11 +431,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // ─────────────────────────────────────────────
 // DATA FETCHING
 // ─────────────────────────────────────────────
-async function fetchSheet(sheetName) {
-  const url  = sheetUrl(sheetName);
-  const resp = await fetch(url);
+async function fetchSheet(name) {
+  const resp = await fetch(sheetUrl(name));
   const text = await resp.text();
-  // Google wraps response in /*O_o*/\ngoogle.visualization.Query.setResponse(...)
   const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
   return json.table;
 }
@@ -331,32 +444,52 @@ function tableToObjects(table) {
     .filter(r => r && r.c && r.c.some(c => c && c.v !== null))
     .map(r => {
       const obj = {};
-      headers.forEach((h, i) => {
-        obj[h] = r.c[i] ? r.c[i].v : null;
-      });
+      headers.forEach((h, i) => { obj[h] = r.c[i] ? r.c[i].v : null; });
       return obj;
     });
 }
 
 // ─────────────────────────────────────────────
-// STATUS HELPERS
+// STATUS
 // ─────────────────────────────────────────────
-function statusClass(status) {
-  if (!status) return 'status-delivered';
-  const s = status.toLowerCase();
-  if (s.includes('service') || s === 'online') return 'status-online';
-  if (s.includes('maintenance'))               return 'status-maintenance';
-  if (s.includes('waiting'))                   return 'status-waiting';
+function statusClass(s) {
+  if (!s) return 'status-delivered';
+  const l = s.toLowerCase();
+  if (l.includes('service') || l === 'online') return 'status-online';
+  if (l.includes('maintenance'))               return 'status-maintenance';
+  if (l.includes('waiting'))                   return 'status-waiting';
   return 'status-delivered';
 }
 
-function statusLabel(status) {
-  if (!status) return 'Delivered';
-  const s = status.toLowerCase();
-  if (s.includes('service') || s === 'online') return 'Online';
-  if (s.includes('maintenance'))               return 'Maintenance';
-  if (s.includes('waiting'))                   return 'Waiting';
-  return status;
+function statusLabel(s) {
+  if (!s) return 'Delivered';
+  const l = s.toLowerCase();
+  if (l.includes('service') || l === 'online') return 'Online';
+  if (l.includes('maintenance'))               return 'Maintenance';
+  if (l.includes('waiting'))                   return 'Waiting';
+  return s;
+}
+
+// ─────────────────────────────────────────────
+// AIRPORT MARKERS
+// ─────────────────────────────────────────────
+function makeAirportMarker(ap) {
+  const isHub = Object.keys(HUB_TZ).includes(ap['ICAO']);
+  const marker = L.circleMarker([ap['Lat.'], ap['Lon']], {
+    radius:      isHub ? 7 : 5,
+    fillColor:   isHub ? '#BFA2DC' : '#5c158a',
+    color:       isHub ? '#c7c9d3' : '#BFA2DC',
+    weight:      1.5,
+    fillOpacity: isHub ? 1 : 0.85,
+  }).addTo(map);
+
+  marker.bindPopup(`
+    <div class="popup-iata">${ap['IATA']}</div>
+    <div class="popup-name">${ap['Airport Name'] || ''}</div>
+    <div class="popup-icao">${ap['ICAO'] || ''}</div>
+  `);
+
+  return marker;
 }
 
 // ─────────────────────────────────────────────
@@ -364,23 +497,23 @@ function statusLabel(status) {
 // ─────────────────────────────────────────────
 async function init() {
   try {
-    document.getElementById('loading-msg').textContent = 'Loading fleet data...';
-    const fleetTable = await fetchSheet(SHEETS.fleet);
-    const fleet      = tableToObjects(fleetTable)
+    document.getElementById('loading-msg').textContent = 'Loading fleet...';
+    const fleet = tableToObjects(await fetchSheet(SHEETS.fleet))
       .filter(r => r['Aircraft Type'] && r['Registration']);
 
-    // Populate sidebar
+    // Sidebar
     const listEl = document.getElementById('fleet-list');
     listEl.innerHTML = '';
     fleet.forEach(ac => {
       const div = document.createElement('div');
       div.className = 'fleet-item';
-      const sc = statusClass(ac['Status']);
-      const sl = statusLabel(ac['Status']);
       div.innerHTML = `
-        <div class="reg">${ac['Registration']}</div>
-        <div class="type">${ac['Aircraft Type']} — ${ac['Home Base'] || '—'}</div>
-        <div class="status ${sc}">${sl}</div>
+        <div class="fleet-item-left">
+          <div class="fleet-reg">${ac['Registration']}</div>
+          <div class="fleet-type">${ac['Aircraft Type']}</div>
+          <div class="fleet-base">${ac['Home Base'] || '—'}</div>
+        </div>
+        <div class="fleet-status ${statusClass(ac['Status'])}">${statusLabel(ac['Status'])}</div>
       `;
       listEl.appendChild(div);
     });
@@ -389,31 +522,15 @@ async function init() {
       `${fleet.length} aircraft`;
 
     document.getElementById('loading-msg').textContent = 'Loading airports...';
-    const airportTable = await fetchSheet(SHEETS.airports);
-    const airports     = tableToObjects(airportTable)
+    const airports = tableToObjects(await fetchSheet(SHEETS.airports))
       .filter(r => r['IATA'] && r['Lat.'] && r['Lon']);
 
-    // Plot airport pins (placeholder style for now)
-    airports.forEach(ap => {
-      const marker = L.circleMarker([ap['Lat.'], ap['Lon']], {
-        radius: 5,
-        fillColor: '#5c158a',
-        color: '#c7c9d3',
-        weight: 1,
-        fillOpacity: 0.9,
-      }).addTo(map);
+    airports.forEach(ap => makeAirportMarker(ap));
 
-      marker.bindPopup(`
-        <b>${ap['IATA']}</b> — ${ap['Airport Name'] || ''}<br>
-        <span style="color:#888; font-size:11px;">${ap['ICAO'] || ''}</span>
-      `);
-    });
-
-    // Hide loading screen
     document.getElementById('loading').style.display = 'none';
 
-  } catch (err) {
-    document.getElementById('loading-msg').textContent = 'Error loading data: ' + err.message;
+  } catch(err) {
+    document.getElementById('loading-msg').textContent = 'Error: ' + err.message;
     console.error(err);
   }
 }
