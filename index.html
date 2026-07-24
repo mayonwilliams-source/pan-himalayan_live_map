@@ -315,11 +315,17 @@ async function init() {
       };
     });
 
-    // Active IATA codes from routes
-    const activeIATA=new Set();
-    Object.values(routeMap).forEach(r=>{
-      activeIATA.add(r.hub);
-      if(r.dests) r.dests.split(',').map(s=>s.trim()).forEach(d=>activeIATA.add(d));
+    // Active IATA codes from schedule (only airports actually being flown)
+    const activeIATA = new Set();
+    scheduleRaw.forEach(row => {
+      ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+        if(row[day]) row[day].split(',').map(s=>s.trim()).forEach(d=>activeIATA.add(d));
+      });
+      // Also add the hub itself
+      if(row['Homebase']) activeIATA.add(
+        // Convert ICAO homebase to IATA by looking it up
+        airportsRaw.find(a=>a['ICAO']===row['Homebase'])?.[  'Airport Information IATA'] || ''
+      );
     });
     console.log('Active IATA codes:',activeIATA.size);
 
