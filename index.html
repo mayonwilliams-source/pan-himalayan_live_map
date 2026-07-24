@@ -85,16 +85,25 @@
     .panel-type { font-size:13px; color:#887799; margin-bottom:12px; }
     .panel-iata { font-family:'Marcellus SC',serif; font-size:26px; color:var(--lilac); letter-spacing:3px; margin-bottom:2px; }
     .panel-airport-name { font-size:12px; color:#887799; margin-bottom:12px; }
-    .leg-item { padding:6px 0; border-bottom:1px solid #1a0a2a; font-size:11px; }
-    .leg-item:last-child { border-bottom:none; }
-    .leg-route { color:var(--mist); font-weight:600; margin-bottom:2px; }
-    .leg-time { color:#665577; }
-    .leg-item.current { background:rgba(92,21,138,0.15); padding:6px 8px; border-radius:4px; margin:0 -8px; }
-    .leg-item.current .leg-route { color:var(--lilac); }
-    .ac-ground-item { padding:6px 0; border-bottom:1px solid #1a0a2a; font-size:11px; }
+
+    /* Flight leg cards */
+    .leg-card { padding:8px 10px; border-radius:4px; background:#0a0012; margin-bottom:6px; border:1px solid #1a0a2a; font-size:13px; }
+    .leg-card.live { background:rgba(92,21,138,0.18); border-color:var(--zanskar); cursor:pointer; }
+    .leg-card.live:hover { background:rgba(92,21,138,0.28); }
+    .leg-card-route { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
+    .leg-card-pair { font-family:'Marcellus SC',serif; font-size:14px; color:var(--mist); letter-spacing:0.5px; }
+    .leg-card-pair.live { color:var(--lilac); }
+    .leg-card-reg { font-size:11px; color:#554466; }
+    .leg-card-status { font-size:11px; color:#665577; }
+    .leg-card-status .status-time { color:var(--mist); font-weight:600; margin-left:4px; }
+    .leg-card-status.live-status { color:var(--turquoise); }
+    .leg-card-status.live-status .status-time { color:var(--turquoise); }
+
+    .ac-ground-item { padding:6px 0; border-bottom:1px solid #1a0a2a; font-size:12px; }
     .ac-ground-item:last-child { border-bottom:none; }
-    .ac-ground-reg { font-family:'Marcellus SC',serif; color:var(--mist); font-size:12px; }
-    .ac-ground-type { color:#665577; font-size:10px; margin-top:1px; }
+    .ac-ground-reg { font-family:'Marcellus SC',serif; color:var(--mist); font-size:13px; }
+    .ac-ground-type { color:#665577; font-size:11px; margin-top:1px; }
+
     .leaflet-container { background:var(--bg); }
     .leaflet-control-zoom a { background:var(--bg2) !important; color:var(--mist) !important; border-color:var(--border) !important; }
     .leaflet-control-zoom a:hover { background:var(--bg3) !important; }
@@ -296,10 +305,8 @@ function getConnectedIATAs(iata,routeMap,airports){
   Object.values(routeMap).forEach(route=>{
     const dests=route.dests.split(',').map(s=>s.trim());
     if(isHub&&route.hub===iata){
-      // Hub: show all destinations in its own routes
       dests.forEach(d=>connected.add(d));
     } else if(!isHub&&dests.includes(iata)){
-      // Non-hub: only connect to the originating hub
       connected.add(route.hub);
     }
   });
@@ -442,10 +449,16 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
     return;
   }
   if(pos.status==='airborne'&&pos.leg) drawFlightArc(pos.leg,pos.legT);
+
   const now=new Date();
-  const legs=getLegsInWindow(ac,routeMap,airports,now,12,24);
   const nowLocal=new Date(now.getTime()+tz*60000);
   const nowHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
+
+  const allLegs=getLegsInWindow(ac,routeMap,airports,now,12,24);
+  const pastLegs=allLegs.filter(l=>l.arrHrs<nowHrs).slice(-4);
+  const futureAndCurrent=allLegs.filter(l=>l.arrHrs>=nowHrs).slice(0,10);
+  const displayLegs=[...pastLegs,...futureAndCurrent];
+
   let statusHtml='';
   if(pos.status==='airborne'){
     const elapsed=nowHrs-pos.deptHrs;
@@ -467,14 +480,23 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
         <div class="panel-row"><span class="panel-label">On ground at</span><span class="panel-val">${loc}</span></div>
       </div>`;
   }
-  const legsHtml=legs.map(leg=>{
-    const isCurrent=pos.status==='airborne'&&leg.fromIATA===pos.fromIATA&&leg.toIATA===pos.toIATA;
+
+  const legsHtml=displayLegs.map(leg=>{
     const isPast=leg.arrHrs<nowHrs;
-    return `<div class="leg-item${isCurrent?' current':''}">
-      <div class="leg-route">${isPast?'✓':isCurrent?'✈':'○'} ${leg.fromIATA} → ${leg.toIATA}</div>
-      <div class="leg-time">${fmtHrs(leg.deptHrs)} – ${fmtHrs(leg.arrHrs)} LT</div>
+    const isLive=leg.deptHrs<=nowHrs&&leg.arrHrs>nowHrs;
+    const timeStr=isPast?fmtHrs(leg.arrHrs):fmtHrs(leg.deptHrs);
+    const label=isPast?'Arrived':isLive?'Live — Arr':fmtHrs(leg.deptHrs);
+    return `<div class="leg-card${isLive?' live':''}">
+      <div class="leg-card-route">
+        <span class="leg-card-pair${isLive?' live':''}">${leg.fromIATA} → ${leg.toIATA}</span>
+        <span class="leg-card-reg">${ac.reg}</span>
+      </div>
+      <div class="leg-card-status${isLive?' live-status':''}">
+        ${isPast?'Arrived':'isLive'?'ETA':'ETD'}<span class="status-time">${timeStr} LT</span>
+      </div>
     </div>`;
   }).join('');
+
   body.innerHTML=`
     <div class="panel-reg">${ac.reg}</div>
     <div class="panel-type">${ac.type}</div>
@@ -485,8 +507,8 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
     </div>
     ${statusHtml}
     <div class="panel-section">
-      <div class="panel-section-title">Flights (±12/24h)</div>
-      ${legsHtml||'<div style="color:#443355;font-size:11px;">No flights in window</div>'}
+      <div class="panel-section-title">Flights</div>
+      ${legsHtml||'<div style="color:#443355;font-size:12px;">No flights in window</div>'}
     </div>`;
 }
 
@@ -504,24 +526,39 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
   const apTZ=Object.entries(HUB_TZ).find(([icao])=>icao===ap.icao);
   const tzOff=apTZ?apTZ[1]:null;
   const localTimeStr=tzOff!==null?formatTime(new Date(now.getTime()+tzOff*60000))+' LT':'—';
-  function legRow(item){
+
+  function legRow(item,type){
     const tz=HUB_TZ[item.ac.homeBase]||345;
     const nl=new Date(now.getTime()+tz*60000);
     const nowHrs=nl.getUTCHours()+nl.getUTCMinutes()/60+nl.getUTCSeconds()/3600;
     const isPast=item.leg.arrHrs<nowHrs;
-    const isCurrent=!isPast&&item.leg.deptHrs<=nowHrs;
-    return `<div class="leg-item${isCurrent?' current':''}">
-      <div class="leg-route">${isPast?'✓':isCurrent?'✈':'○'} ${item.leg.fromIATA} → ${item.leg.toIATA} <span style="color:#554466;font-size:10px;">${item.ac.reg}</span></div>
-      <div class="leg-time">${fmtHrs(item.leg.deptHrs)} – ${fmtHrs(item.leg.arrHrs)} LT</div>
+    const isLive=item.leg.deptHrs<=nowHrs&&item.leg.arrHrs>nowHrs;
+    const timeVal=type==='arr'
+      ?(isPast?fmtHrs(item.leg.arrHrs):fmtHrs(item.leg.arrHrs))
+      :(isPast?fmtHrs(item.leg.deptHrs):fmtHrs(item.leg.deptHrs));
+    const statusWord=type==='arr'
+      ?(isPast?'Arrived':isLive?'ETA':'ETA')
+      :(isPast?'Departed':isLive?'Live':'ETD');
+    const clickAttr=isLive?`onclick="window._openAcFromAirport('${item.ac.reg}')" style="cursor:pointer;"`:''
+    return `<div class="leg-card${isLive?' live':''}" ${clickAttr}>
+      <div class="leg-card-route">
+        <span class="leg-card-pair${isLive?' live':''}">${item.leg.fromIATA} → ${item.leg.toIATA}</span>
+        <span class="leg-card-reg">${item.ac.reg}</span>
+      </div>
+      <div class="leg-card-status${isLive?' live-status':''}">
+        ${statusWord}<span class="status-time">${timeVal} LT</span>
+      </div>
     </div>`;
   }
-  const depsHtml=deps.length?deps.map(legRow).join(''):'<div style="color:#443355;font-size:11px;">None in window</div>';
-  const arrsHtml=arrs.length?arrs.map(legRow).join(''):'<div style="color:#443355;font-size:11px;">None in window</div>';
+
+  const depsHtml=deps.length?deps.map(i=>legRow(i,'dep')).join(''):'<div style="color:#443355;font-size:12px;">None in window</div>';
+  const arrsHtml=arrs.length?arrs.map(i=>legRow(i,'arr')).join(''):'<div style="color:#443355;font-size:12px;">None in window</div>';
   const groundHtml=ground.length?ground.map(ac=>`
     <div class="ac-ground-item">
       <div class="ac-ground-reg">${ac.reg}</div>
       <div class="ac-ground-type">${ac.type}</div>
-    </div>`).join(''):'<div style="color:#443355;font-size:11px;">No aircraft on ground</div>';
+    </div>`).join(''):'<div style="color:#443355;font-size:12px;">No aircraft on ground</div>';
+
   body.innerHTML=`
     <div class="panel-iata">${ap.iata}</div>
     <div class="panel-airport-name">${ap.name||''} · ${ap.icao}</div>
@@ -613,8 +650,8 @@ async function init(){
       const isHub=Object.keys(HUB_TZ).includes(icao);
       const marker=L.circleMarker([obj.lat,obj.lon],{
         radius:      isHub ? 9 : 5,
-        fillColor:   isHub ? '#c7c9d3' : '#5c158a',
-        color:       isHub ? '#5c158a' : '#BFA2DC',
+        fillColor:   isHub ? '#5c158a' : '#BFA2DC',
+        color:       isHub ? '#c7c9d3' : '#5c158a',
         weight:      isHub ? 2 : 1.5,
         fillOpacity: isHub ? 1 : 0.85,
       }).addTo(map);
@@ -636,7 +673,6 @@ async function init(){
       });
     });
 
-    // Group by type for sidebar
     const typeGroups={};
     aircraftData.forEach(ac=>{
       if(!typeGroups[ac.type]) typeGroups[ac.type]=[];
@@ -650,7 +686,6 @@ async function init(){
     const planeMarkers={};
     const posCache={};
 
-    // Compute positions
     aircraftData.forEach(ac=>{
       if(!ac.homeBase) return;
       const hubAp=airportsByICAO[ac.homeBase];
@@ -661,7 +696,6 @@ async function init(){
       const route=routeNum?routeMap[routeNum]:null;
       const pos=route&&hubAp?computePosition(ac,route,airportsByICAO,now):{status:'ground',lat:hubAp?.lat||null,lon:hubAp?.lon||null};
       posCache[ac.reg]=pos;
-
       if(pos.status==='airborne'){
         const marker=L.marker([pos.lat,pos.lon],{icon:planeIcon(pos.heading)}).addTo(map);
         marker.bindTooltip(ac.reg,{permanent:false,direction:'top',className:'leaflet-tooltip'});
@@ -670,7 +704,6 @@ async function init(){
       }
     });
 
-    // Build grouped sidebar — collapsed by default
     Object.entries(typeGroups).forEach(([type,acs])=>{
       const groupDiv=document.createElement('div');
       groupDiv.className='type-group';
@@ -707,6 +740,17 @@ async function init(){
     window._routeMap=routeMap;
     window._airportsByICAO=airportsByICAO;
     window._aircraftData=aircraftData;
+
+    // Allow clicking live flights in airport panel to open aircraft panel
+    window._openAcFromAirport=(reg)=>{
+      const ac=window.aircraftDataMap[reg];
+      const pos=window.posCache[reg];
+      const jsDow=new Date().getUTCDay();
+      const sheetDow=jsDow===0?6:jsDow-1;
+      const routeNum=ac.routeNums[sheetDow];
+      const route=routeNum?routeMap[routeNum]:null;
+      if(ac&&pos&&route) openAircraftPanel(ac,pos,route,routeMap,airportsByICAO);
+    };
 
     setInterval(()=>{
       const now=new Date();
