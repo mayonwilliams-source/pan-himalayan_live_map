@@ -744,10 +744,13 @@ async function init() {
     const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
       .filter(r => r['Aircraft'] && r['Aircraft Type']);
 
-    // Build per-aircraft data structure
-    const aircraftData = [];
-    scheduleRaw.forEach(row => {
-      const reg = row['Aircraft'];
+      // Build per-aircraft data structure
+      const aircraftData = [];
+      scheduleRaw.forEach(row => {
+          console.log('Schedule raw:', scheduleRaw.slice(0, 2));
+          console.log('Route map:', routeMap);
+          console.log('Fleet:', fleet.slice(0, 2));
+          const reg = row['Aircraft'];
       const fleetRow = fleet.find(f => f['Registration'] === reg);
       if (!fleetRow) return;
 
