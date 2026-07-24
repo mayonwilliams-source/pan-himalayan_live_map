@@ -359,132 +359,139 @@ function updateClocks() {
   document.getElementById('clock-utc').textContent   = formatTime(now);
   document.getElementById('clock-local').textContent = now.toLocaleTimeString('en-GB');
 }
-setInterval(updateClocks, 1000);
-updateClocks();
+    setInterval(updateClocks, 1000);
+    updateClocks();
 
-// ── MAP ───────────────────────────────────────
+    // ── MAP ───────────────────────────────────────
 
-const map = L.map('map', { center:[27.5,87], zoom:5 });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap contributors', maxZoom:18 }).addTo(map);
+    const map = L.map('map', { center: [27.5, 87], zoom: 5 });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
 
-// ── DATA ──────────────────────────────────────
+    // ── DATA ──────────────────────────────────────
 
-async function fetchSheet(name) {
-  const resp = await fetch(sheetUrl(name));
-  const text = await resp.text();
-  const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
-  return json.table;
-}
+    async function fetchSheet(name) {
+        const resp = await fetch(sheetUrl(name));
+        const text = await resp.text();
+        const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+        return json.table;
+    }
 
-function tableToObjects(table) {
-  const headers = table.cols.map(c => c.label);
-  return table.rows
-    .filter(r => r && r.c && r.c.some(c => c && c.v !== null))
-    .map(r => {
-      const obj = {};
-      headers.forEach((h,i) => { obj[h] = r.c[i] ? r.c[i].v : null; });
-      return obj;
-    });
-}
+    function tableToObjects(table) {
+        const headers = table.cols.map(c => c.label);
+        return table.rows
+            .filter(r => r && r.c && r.c.some(c => c && c.v !== null))
+            .map(r => {
+                const obj = {};
+                headers.forEach((h, i) => { obj[h] = r.c[i] ? r.c[i].v : null; });
+                return obj;
+            });
+    }
 
-// ── STATUS ────────────────────────────────────
+    // ── STATUS ────────────────────────────────────
 
-function statusClass(s) {
-  if (!s) return 'status-delivered';
-  const l = s.toLowerCase();
-  if (l.includes('service') || l==='online') return 'status-online';
-  if (l.includes('maintenance'))             return 'status-maintenance';
-  if (l.includes('waiting'))                 return 'status-waiting';
-  return 'status-delivered';
-}
+    function statusClass(s) {
+        if (!s) return 'status-delivered';
+        const l = s.toLowerCase();
+        if (l.includes('service') || l === 'online') return 'status-online';
+        if (l.includes('maintenance')) return 'status-maintenance';
+        if (l.includes('waiting')) return 'status-waiting';
+        return 'status-delivered';
+    }
 
-function statusLabel(s) {
-  if (!s) return 'Delivered';
-  const l = s.toLowerCase();
-  if (l.includes('service') || l==='online') return 'Online';
-  if (l.includes('maintenance'))             return 'Maintenance';
-  if (l.includes('waiting'))                 return 'Waiting';
-  return s;
-}
+    function statusLabel(s) {
+        if (!s) return 'Delivered';
+        const l = s.toLowerCase();
+        if (l.includes('service') || l === 'online') return 'Online';
+        if (l.includes('maintenance')) return 'Maintenance';
+        if (l.includes('waiting')) return 'Waiting';
+        return s;
+    }
 
-// ── PLANE ICON ────────────────────────────────
+    // ── PLANE ICON ────────────────────────────────
 
-function planeIcon(isAirborne, heading) {
-  const html = `<div style="width:20px;height:20px;background:${isAirborne?'#F7B500':'#c7c9d3'};border:2px solid ${isAirborne?'#c7c9d3':'#5c158a'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transform:rotate(${heading||0}deg);">✈</div>`;
-  return L.divIcon({ html, className:'', iconSize:[20,20], iconAnchor:[10,10] });
-}
+    function planeIcon(isAirborne, heading) {
+        const html = `<div style="width:20px;height:20px;background:${isAirborne ? '#F7B500' : '#c7c9d3'};border:2px solid ${isAirborne ? '#c7c9d3' : '#5c158a'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transform:rotate(${heading || 0}deg);">✈</div>`;
+        return L.divIcon({ html, className: '', iconSize: [20, 20], iconAnchor: [10, 10] });
+    }
 
-// ── AIRPORT MARKERS ───────────────────────────
+    // ── AIRPORT MARKERS ───────────────────────────
 
-function makeAirportMarker(ap) {
-  const isHub = Object.keys(HUB_TZ).includes(ap['ICAO']);
-  const marker = L.circleMarker([ap['Lat.'], ap['Lon']], {
-    radius: isHub?7:5, fillColor: isHub?'#BFA2DC':'#5c158a',
-    color: isHub?'#c7c9d3':'#BFA2DC', weight:1.5, fillOpacity: isHub?1:0.85,
-  }).addTo(map);
-  marker.bindPopup(`<div class="popup-iata">${ap['IATA']}</div><div class="popup-name">${ap['Airport Name']||''}</div><div class="popup-icao">${ap['ICAO']||''}</div>`);
-  return marker;
-}
+    function makeAirportMarker(ap) {
+        const isHub = Object.keys(HUB_TZ).includes(ap['ICAO']);
+        const marker = L.circleMarker([ap['Lat.'], ap['Lon']], {
+            radius: isHub ? 7 : 5, fillColor: isHub ? '#BFA2DC' : '#5c158a',
+            color: isHub ? '#c7c9d3' : '#BFA2DC', weight: 1.5, fillOpacity: isHub ? 1 : 0.85,
+        }).addTo(map);
+        marker.bindPopup(`<div class="popup-iata">${ap['IATA']}</div><div class="popup-name">${ap['Airport Name'] || ''}</div><div class="popup-icao">${ap['ICAO'] || ''}</div>`);
+        return marker;
+    }
 
-// ── INIT ──────────────────────────────────────
+    // ── INIT ──────────────────────────────────────
 
-async function init() {
-  try {
-    console.log('Init started');
+    async function init() {
+        try {
+            console.log('Init started');
 
-    // Fleet
-    document.getElementById('loading-msg').textContent = 'Loading fleet...';
-    const fleetRaw = tableToObjects(await fetchSheet(SHEETS.fleet));
-    const fleet    = fleetRaw.filter(r => r['Fleet Information Aircraft Type'] && r['Registration']);
-    console.log('Fleet loaded:', fleet.length, 'aircraft');
+            // Fleet
+            document.getElementById('loading-msg').textContent = 'Loading fleet...';
+            const fleetRaw = tableToObjects(await fetchSheet(SHEETS.fleet));
+            const fleet = fleetRaw.filter(r => r['Fleet Information Aircraft Type'] && r['Registration']);
+            console.log('Fleet loaded:', fleet.length, 'aircraft');
 
-    const listEl = document.getElementById('fleet-list');
-    listEl.innerHTML = '';
-    fleet.forEach(ac => {
-      const div = document.createElement('div');
-      div.className = 'fleet-item';
-      div.innerHTML = `
+            const listEl = document.getElementById('fleet-list');
+            listEl.innerHTML = '';
+            fleet.forEach(ac => {
+                const div = document.createElement('div');
+                div.className = 'fleet-item';
+                div.innerHTML = `
         <div class="fleet-item-left">
           <div class="fleet-reg">${ac['Registration']}</div>
           <div class="fleet-type">${ac['Fleet Information Aircraft Type']}</div>
-          <div class="fleet-base">${ac['Home Base']||'—'}</div>
+          <div class="fleet-base">${ac['Home Base'] || '—'}</div>
         </div>
         <div class="fleet-status ${statusClass(ac['Status'])}">${statusLabel(ac['Status'])}</div>
       `;
-      listEl.appendChild(div);
-    });
-    document.getElementById('fleet-count').textContent = `${fleet.length} aircraft`;
+                listEl.appendChild(div);
+            });
+            document.getElementById('fleet-count').textContent = `${fleet.length} aircraft`;
 
-    // Airports
-    document.getElementById('loading-msg').textContent = 'Loading airports...';
-    const airports = tableToObjects(await fetchSheet(SHEETS.airports)).filter(r => r['IATA'] && r['Lat.'] && r['Lon']);
-    console.log('Airports loaded:', airports.length);
+            // Airports
+            const airports = tableToObjects(await fetchSheet(SHEETS.airports))
+                .filter(r => r['Airport Information IATA'] && r['Lat.'] && r['Lon.']);
 
-    airports.forEach(ap => makeAirportMarker(ap));
+            // Airport lookup
+            airports.forEach(ap => {
+                airportsByICAO[ap['ICAO']] = { lat: ap['Lat.'], lon: ap['Lon.'], iata: ap['Airport Information IATA'], icao: ap['ICAO'], name: ap['Airport Name'] };
+            });
 
-    const airportsByICAO = {};
-    airports.forEach(ap => {
-      airportsByICAO[ap['ICAO']] = { lat:ap['Lat.'], lon:ap['Lon'], iata:ap['IATA'], icao:ap['ICAO'], name:ap['Airport Name'] };
-    });
+            // Airport markers
+            function makeAirportMarker(ap) {
+                const isHub = Object.keys(HUB_TZ).includes(ap['ICAO']);
+                const marker = L.circleMarker([ap['Lat.'], ap['Lon.']], {
+                    ...
+  });
+                marker.bindPopup(`
+    <div class="popup-iata">${ap['Airport Information IATA']}</div>
+    ...
+  `);
+            }
 
-    // Routes
-    document.getElementById('loading-msg').textContent = 'Loading routes...';
-    const routesRaw = tableToObjects(await fetchSheet(SHEETS.routes)).filter(r => r['No.'] && r['Route']);
-    console.log('Routes loaded:', routesRaw.length);
+            // Routes
+            const routesRaw = tableToObjects(await fetchSheet(SHEETS.routes))
+                .filter(r => r['Route Master List No.'] && r['Route']);
 
-    const routeMap = {};
-    routesRaw.forEach(r => {
-      routeMap[r['No.']] = {
-        id:        r['No.'],
-        hub:       r['Hub'],
-        dests:     r['Route'],
-        startTime: r['Start Time (LT)'] ? parseTime(r['Start Time (LT)']) : 6.0,
-      };
-    });
+            routesRaw.forEach(r => {
+                routeMap[r['Route Master List No.']] = {
+                    id: r['Route Master List No.'],
+                    hub: r['Hub'],
+                    dests: r['Route'],
+                    startTime: r['Start Time (LT)'] ? parseTime(r['Start Time (LT)']) : 6.0,
+                };
+            });
 
-    // Schedule
-    document.getElementById('loading-msg').textContent = 'Loading schedule...';
-    const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
+            // Schedule
+            document.getElementById('loading-msg').textContent = 'Loading schedule...';
+            const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
       .filter(r => r['Aircraft'] && r['Aircraft Schedule Aircraft Type']);
     console.log('Schedule rows:', scheduleRaw.length);
 
