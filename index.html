@@ -305,9 +305,21 @@ async function init() {
       .filter(r=>r['Airport Information IATA']&&r['Lat.']&&r['Lon.']);
     console.log('Airports loaded:',airportsRaw.length);
 
+    // Build set of active IATA codes from routes
+    const activeIATA = new Set();
+    Object.values(routeMap).forEach(r => {
+      // Add hub
+      activeIATA.add(r.hub);
+      // Add all destinations
+      if(r.dests) r.dests.split(',').map(s=>s.trim()).forEach(d=>activeIATA.add(d));
+    });
+    console.log('Active IATA codes:', activeIATA.size);
+
     const airportsByICAO={};
     airportsRaw.forEach(ap=>{
-      const obj={lat:ap['Lat.'],lon:ap['Lon.'],iata:ap['Airport Information IATA'],icao:ap['ICAO'],name:ap['Airport Name']};
+      const iata = ap['Airport Information IATA'];
+      if(!activeIATA.has(iata)) return; // skip inactive airports
+      const obj={lat:ap['Lat.'],lon:ap['Lon.'],iata,icao:ap['ICAO'],name:ap['Airport Name']};
       airportsByICAO[ap['ICAO']]=obj;
       makeAirportMarker(obj);
     });
