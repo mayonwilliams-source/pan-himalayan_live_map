@@ -689,6 +689,7 @@ function makeAirportMarker(ap) {
 // ─────────────────────────────────────────────
 async function init() {
   try {
+    console.log('Init started');
     document.getElementById('loading-msg').textContent = 'Loading fleet...';
     const fleet = tableToObjects(await fetchSheet(SHEETS.fleet))
       .filter(r => r['Aircraft Type'] && r['Registration']);
@@ -851,12 +852,13 @@ async function init() {
       });
     }, 30000);
 
-    document.getElementById('loading').style.display = 'none';
+        document.getElementById('loading').style.display = 'none';
 
-  } catch(err) {
-    document.getElementById('loading-msg').textContent = 'Error: ' + err.message;
-    console.error(err);
-  }
+    } catch (err) {
+        console.error('INIT ERROR:', err);
+        console.error('Stack:', err.stack);
+        document.getElementById('loading-msg').textContent = 'Error: ' + err.message;
+    }
 }
 
 init();
