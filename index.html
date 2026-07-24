@@ -21,7 +21,7 @@
       --juniper:   #4B5D43;
       --rose:      #8a345f;
       --bg:        #000000;
-      --bg2:       #5c158a;
+      --bg2:       #000000;
       --bg3:       #0a0208;       
       --border:    #BFA2DC;
     }
@@ -718,6 +718,135 @@ async function init() {
       .filter(r => r['IATA'] && r['Lat.'] && r['Lon']);
 
     airports.forEach(ap => makeAirportMarker(ap));
+
+    // Build airport lookup by ICAO and IATA
+    const airportsByICAO = {};
+    const airportsByIATA = {};
+    airports.forEach(ap => {
+      airportsByICAO[ap['ICAO']] = { lat: ap['Lat.'], lon: ap['Lon'], iata: ap['IATA'], icao: ap['ICAO'], name: ap['Airport Name'] };
+      airportsByIATA[ap['IATA']] = { lat: ap['Lat.'], lon: ap['Lon'], iata: ap['IATA'], icao: ap['ICAO'], name: ap['Airport Name'] };
+    });
+
+    document.getElementById('loading-msg').textContent = 'Loading routes...';
+    const routesRaw = tableToObjects(await fetchSheet(SHEETS.routes))
+      .filter(r => r['No.'] && r['Route']);
+    const routeMap = {};
+    routesRaw.forEach(r => {
+      routeMap[r['No.']] = {
+        id:        r['No.'],
+        hub:       r['Hub'],
+        dests:     r['Route'],
+        startTime: r['Start Time (LT)'] ? parseTime(r['Start Time (LT)']) : 6.0,
+      };
+    });
+
+    document.getElementById('loading-msg').textContent = 'Loading schedule...';
+    const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
+      .filter(r => r['Aircraft'] && r['Aircraft Type']);
+
+    // Build per-aircraft data structure
+    const aircraftData = [];
+    scheduleRaw.forEach(row => {
+      const reg = row['Aircraft'];
+      const fleetRow = fleet.find(f => f['Registration'] === reg);
+      if (!fleetRow) return;
+
+      // Schedule: 7 days, index 0=Mon
+      const schedule    = [row['Monday'],row['Tuesday'],row['Wednesday'],row['Thursday'],row['Friday'],row['Saturday'],row['Sunday']];
+      const routeNums   = [row['M'],row['Tu'],row['W'],row['Th'],row['F'],row['Sa'],row['Su']];
+
+      aircraftData.push({
+        reg,
+        type:       fleetRow['Aircraft Type'],
+        homeBase:   fleetRow['Home Base'],
+        status:     fleetRow['Status'],
+        speed:      parseFloat(fleetRow['Average Cruise Speed [kts]']) || 447,
+        turnaround: fleetRow['Turnaround Time'] || '0:45:00',
+        schedule,
+        routeNums,
+      });
+    });
+
+    // Place aircraft markers
+    const planeMarkers = {};
+    aircraftData.forEach(ac => {
+      if (!ac.homeBase) return;
+      const hubAp = airportsByICAO[ac.homeBase];
+      if (!hubAp) return;
+
+      // Get today's route
+      const now      = new Date();
+      const jsDow    = new Date(now.getTime() + (HUB_TZ[ac.homeBase]||345)*60000).getUTCDay();
+      const sheetDow = jsDow === 0 ? 6 : jsDow - 1;
+      const routeNum = ac.routeNums[sheetDow];
+      const route    = routeNum ? routeMap[routeNum] : null;
+
+      const pos = route
+        ? computePosition(ac, route, airportsByICAO, now)
+        : { status: 'ground', lat: hubAp.lat, lon: hubAp.lon };
+
+      if (pos.lat === null) {
+        pos.lat = hubAp.lat;
+        pos.lon = hubAp.lon;
+      }
+
+      // Simple plane icon using SVG
+      const isAirborne = pos.status === 'airborne';
+      const iconHtml = `<div style="
+        width:20px; height:20px;
+        background: ${isAirborne ? '#F7B500' : '#c7c9d3'};
+        border: 2px solid ${isAirborne ? '#c7c9d3' : '#5c158a'};
+        border-radius: 50%;
+        display:flex; align-items:center; justify-content:center;
+        font-size:10px; cursor:pointer;
+        transform: rotate(${pos.heading||0}deg);
+      ">✈</div>`;
+
+      const icon = L.divIcon({ html: iconHtml, className: '', iconSize: [20,20], iconAnchor: [10,10] });
+      const marker = L.marker([pos.lat, pos.lon], { icon }).addTo(map);
+
+      const deptStr = pos.deptHrs !== undefined ? `${Math.floor(pos.deptHrs)}:${String(Math.round((pos.deptHrs%1)*60)).padStart(2,'0')}` : '—';
+      const arrStr  = pos.arrHrs  !== undefined ? `${Math.floor(pos.arrHrs)}:${String(Math.round((pos.arrHrs%1)*60)).padStart(2,'0')}` : '—';
+
+      marker.bindPopup(`
+        <div class="popup-iata">${ac.reg}</div>
+        <div class="popup-name">${ac.type}</div>
+        <div class="popup-icao">Base: ${ac.homeBase}</div>
+        <div class="popup-icao" style="margin-top:6px;">
+          ${isAirborne
+            ? `✈ ${pos.fromIATA} → ${pos.toIATA}<br>Dep: ${deptStr} &nbsp; Arr: ${arrStr} LT`
+            : `⬛ On ground${pos.atIATA ? ' at ' + pos.atIATA : ''}`
+          }
+        </div>
+        ${routeNum ? `<div class="popup-icao" style="margin-top:4px;">Route: ${routeNum}</div>` : ''}
+      `);
+
+      planeMarkers[ac.reg] = { marker, ac, route, pos };
+    });
+
+    // Update positions every 30 seconds
+    setInterval(() => {
+      const now = new Date();
+      Object.values(planeMarkers).forEach(({ marker, ac, route }) => {
+        if (!route) return;
+        const hubAp = airportsByICAO[ac.homeBase];
+        if (!hubAp) return;
+        const pos = computePosition(ac, route, airportsByICAO, now);
+        if (pos.lat === null) return;
+        marker.setLatLng([pos.lat, pos.lon]);
+        const isAirborne = pos.status === 'airborne';
+        const iconHtml = `<div style="
+          width:20px; height:20px;
+          background: ${isAirborne ? '#F7B500' : '#c7c9d3'};
+          border: 2px solid ${isAirborne ? '#c7c9d3' : '#5c158a'};
+          border-radius: 50%;
+          display:flex; align-items:center; justify-content:center;
+          font-size:10px; cursor:pointer;
+          transform: rotate(${pos.heading||0}deg);
+        ">✈</div>`;
+        marker.setIcon(L.divIcon({ html: iconHtml, className: '', iconSize: [20,20], iconAnchor: [10,10] }));
+      });
+    }, 30000);
 
     document.getElementById('loading').style.display = 'none';
 
