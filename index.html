@@ -4,194 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pan-Himalayan Airlines — Live Fleet Map</title>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-
   <style>
     :root {
-      --zanskar:   #5c158a;
-      --lilac:     #BFA2DC;
-      --marigold:  #F7B500;
-      --turquoise: #269473;
-      --red:       #D91E36;
-      --mist:      #c7c9d3;
-      --black:     #000000;
-      --copper:    #B87333;
-      --juniper:   #4B5D43;
-      --rose:      #8a345f;
-      --bg:        #000000;
-      --bg2:       #000000;
-      --bg3:       #0a0208;
-      --border:    #5c158a;
+      --zanskar:#5c158a; --lilac:#BFA2DC; --marigold:#F7B500; --turquoise:#269473;
+      --red:#D91E36; --mist:#c7c9d3; --bg:#000000; --bg2:#000000; --bg3:#0a0208; --border:#5c158a;
     }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Alegreya Sans', sans-serif;
-      background: var(--bg);
-      color: var(--mist);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    #topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      height: 52px;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-      z-index: 1000;
-    }
-
-    .brand { display: flex; align-items: baseline; gap: 12px; }
-
-    .brand-name {
-      font-family: 'Marcellus SC', serif;
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      color: var(--mist);
-    }
-
-    .brand-sub {
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--lilac);
-      font-family: 'Marcellus SC', serif;
-    }
-
-    #clock-block { display: flex; gap: 28px; }
-
-    .tz { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-
-    .tz .label {
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--lilac);
-    }
-
-    .tz .time {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--zanskar);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 1px;
-    }
-
-    #fleet-count { font-size: 12px; color: #444; letter-spacing: 1px; }
-
-    #main { display: flex; flex: 1; overflow: hidden; }
-
-    #map { flex: 1; background: var(--bg); }
-
-    #sidebar {
-      width: 290px;
-      background: var(--bg2);
-      border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    .sidebar-header {
-      font-family: 'Marcellus SC', serif;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--lilac);
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    #fleet-list { overflow-y: auto; flex: 1; padding: 6px 0; }
-    #fleet-list::-webkit-scrollbar { width: 4px; }
-    #fleet-list::-webkit-scrollbar-track { background: var(--bg2); }
-    #fleet-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .fleet-item {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.15s;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .fleet-item:hover { background: var(--bg3); }
-
-    .fleet-reg {
-      font-family: 'Marcellus SC', serif;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--mist);
-      letter-spacing: 1px;
-    }
-
-    .fleet-type { font-size: 11px; color: #554466; margin-top: 2px; letter-spacing: 0.3px; }
-    .fleet-base { font-size: 11px; color: var(--lilac); margin-top: 2px; opacity: 0.7; }
-
-    .fleet-status {
-      font-size: 9px;
-      padding: 2px 7px;
-      border-radius: 2px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-top: 2px;
-      white-space: nowrap;
-    }
-
-    .status-online      { background: #0a2a0a; color: var(--turquoise); border: 1px solid #1a4a1a; }
-    .status-maintenance { background: #2a0a0a; color: var(--red);       border: 1px solid #4a1a1a; }
-    .status-waiting     { background: #2a1a00; color: var(--marigold);  border: 1px solid #4a3a00; }
-    .status-delivered   { background: #1a0a2a; color: var(--lilac);     border: 1px solid #2a1a3a; }
-
-    .leaflet-container { background: var(--bg); }
-    .leaflet-tile { filter: brightness(0.45) saturate(0.3) hue-rotate(210deg); }
-    .leaflet-control-zoom a { background: var(--bg2) !important; color: var(--mist) !important; border-color: var(--border) !important; }
-    .leaflet-control-zoom a:hover { background: var(--bg3) !important; }
-    .leaflet-control-attribution { background: rgba(10,2,8,0.85) !important; color: #333 !important; font-size: 9px !important; }
-    .leaflet-control-attribution a { color: #444 !important; }
-
-    .leaflet-popup-content-wrapper {
-      background: var(--bg2) !important;
-      color: var(--mist) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 4px !important;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
-      font-family: 'Alegreya Sans', sans-serif !important;
-    }
-
-    .leaflet-popup-tip { background: var(--bg2) !important; }
-    .leaflet-popup-content { font-size: 13px; line-height: 1.6; margin: 10px 14px !important; }
-
-    .popup-iata { font-family: 'Marcellus SC', serif; font-size: 18px; font-weight: 600; color: var(--lilac); letter-spacing: 1px; }
-    .popup-name { font-size: 12px; color: var(--mist); margin-top: 1px; }
-    .popup-icao { font-size: 10px; color: #887799; letter-spacing: 1px; margin-top: 2px; }
-
-    #loading {
-      position: fixed; inset: 0; background: var(--bg);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 9999; gap: 20px;
-    }
-
-    #loading .logo { font-family: 'Marcellus SC', serif; font-size: 26px; font-weight: 600; color: var(--mist); letter-spacing: 2px; }
-    #loading .tagline { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--lilac); }
-    #loading .spinner { width: 36px; height: 36px; border: 2px solid var(--border); border-top-color: var(--zanskar); border-radius: 50%; animation: spin 0.9s linear infinite; }
-    #loading .msg { font-size: 12px; color: #443355; letter-spacing: 1px; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Alegreya Sans',sans-serif; background:var(--bg); color:var(--mist); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+    #topbar { display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0; z-index:1000; }
+    .brand { display:flex; align-items:baseline; gap:12px; }
+    .brand-name { font-family:'Marcellus SC',serif; font-size:18px; font-weight:600; letter-spacing:1.5px; color:var(--mist); }
+    .brand-sub { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--lilac); font-family:'Marcellus SC',serif; }
+    #clock-block { display:flex; gap:28px; }
+    .tz { display:flex; flex-direction:column; align-items:center; gap:1px; }
+    .tz .label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--lilac); }
+    .tz .time { font-size:15px; font-weight:600; color:var(--zanskar); font-variant-numeric:tabular-nums; letter-spacing:1px; }
+    #fleet-count { font-size:12px; color:#444; letter-spacing:1px; }
+    #main { display:flex; flex:1; overflow:hidden; }
+    #map { flex:1; background:var(--bg); }
+    #sidebar { width:290px; background:var(--bg2); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; }
+    .sidebar-header { font-family:'Marcellus SC',serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--lilac); padding:14px 16px 10px; border-bottom:1px solid var(--border); }
+    #fleet-list { overflow-y:auto; flex:1; padding:6px 0; }
+    #fleet-list::-webkit-scrollbar { width:4px; }
+    #fleet-list::-webkit-scrollbar-track { background:var(--bg2); }
+    #fleet-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+    .fleet-item { padding:10px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.15s; display:flex; justify-content:space-between; align-items:flex-start; }
+    .fleet-item:hover { background:var(--bg3); }
+    .fleet-reg { font-family:'Marcellus SC',serif; font-size:14px; font-weight:600; color:var(--mist); letter-spacing:1px; }
+    .fleet-type { font-size:11px; color:#554466; margin-top:2px; letter-spacing:0.3px; }
+    .fleet-base { font-size:11px; color:var(--lilac); margin-top:2px; opacity:0.7; }
+    .fleet-status { font-size:9px; padding:2px 7px; border-radius:2px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-top:2px; white-space:nowrap; }
+    .status-online      { background:#0a2a0a; color:var(--turquoise); border:1px solid #1a4a1a; }
+    .status-maintenance { background:#2a0a0a; color:var(--red);       border:1px solid #4a1a1a; }
+    .status-waiting     { background:#2a1a00; color:var(--marigold);  border:1px solid #4a3a00; }
+    .status-delivered   { background:#1a0a2a; color:var(--lilac);     border:1px solid #2a1a3a; }
+    .leaflet-container { background:var(--bg); }
+    .leaflet-tile { filter:brightness(0.45) saturate(0.3) hue-rotate(210deg); }
+    .leaflet-control-zoom a { background:var(--bg2) !important; color:var(--mist) !important; border-color:var(--border) !important; }
+    .leaflet-control-zoom a:hover { background:var(--bg3) !important; }
+    .leaflet-control-attribution { background:rgba(10,2,8,0.85) !important; color:#333 !important; font-size:9px !important; }
+    .leaflet-control-attribution a { color:#444 !important; }
+    .leaflet-popup-content-wrapper { background:var(--bg2) !important; color:var(--mist) !important; border:1px solid var(--border) !important; border-radius:4px !important; box-shadow:0 4px 20px rgba(0,0,0,0.6) !important; font-family:'Alegreya Sans',sans-serif !important; }
+    .leaflet-popup-tip { background:var(--bg2) !important; }
+    .leaflet-popup-content { font-size:13px; line-height:1.6; margin:10px 14px !important; }
+    .popup-iata { font-family:'Marcellus SC',serif; font-size:18px; font-weight:600; color:var(--lilac); letter-spacing:1px; }
+    .popup-name { font-size:12px; color:var(--mist); margin-top:1px; }
+    .popup-icao { font-size:10px; color:#887799; letter-spacing:1px; margin-top:2px; }
+    #loading { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; gap:20px; }
+    #loading .logo { font-family:'Marcellus SC',serif; font-size:26px; font-weight:600; color:var(--mist); letter-spacing:2px; }
+    #loading .tagline { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--lilac); }
+    #loading .spinner { width:36px; height:36px; border:2px solid var(--border); border-top-color:var(--zanskar); border-radius:50%; animation:spin 0.9s linear infinite; }
+    #loading .msg { font-size:12px; color:#443355; letter-spacing:1px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -220,9 +86,7 @@
   <div id="map"></div>
   <div id="sidebar">
     <div class="sidebar-header">Fleet</div>
-    <div id="fleet-list">
-      <div style="padding:20px; color:#443355; font-size:13px;">Loading fleet data...</div>
-    </div>
+    <div id="fleet-list"><div style="padding:20px;color:#443355;font-size:13px;">Loading...</div></div>
   </div>
 </div>
 
@@ -233,98 +97,93 @@
 
 function haversineNmi(lat1, lon1, lat2, lon2) {
   const R = 3440.065;
-  const phi1 = lat1*Math.PI/180, phi2 = lat2*Math.PI/180;
-  const dphi = (lat2-lat1)*Math.PI/180, dlam = (lon2-lon1)*Math.PI/180;
+  const phi1=lat1*Math.PI/180, phi2=lat2*Math.PI/180;
+  const dphi=(lat2-lat1)*Math.PI/180, dlam=(lon2-lon1)*Math.PI/180;
   const a = Math.sin(dphi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dlam/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function greatCircleInterp(lat1, lon1, lat2, lon2, t) {
-  const toRad = d => d*Math.PI/180, toDeg = r => r*180/Math.PI;
-  const φ1=toRad(lat1), λ1=toRad(lon1), φ2=toRad(lat2), λ2=toRad(lon2);
-  const d = 2*Math.asin(Math.sqrt(Math.sin((φ2-φ1)/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2));
-  if (d < 1e-10) return { lat: lat1, lon: lon1 };
-  const A = Math.sin((1-t)*d)/Math.sin(d), B = Math.sin(t*d)/Math.sin(d);
-  const x = A*Math.cos(φ1)*Math.cos(λ1) + B*Math.cos(φ2)*Math.cos(λ2);
-  const y = A*Math.cos(φ1)*Math.sin(λ1) + B*Math.cos(φ2)*Math.sin(λ2);
-  const z = A*Math.sin(φ1) + B*Math.sin(φ2);
-  return { lat: toDeg(Math.atan2(z, Math.sqrt(x*x+y*y))), lon: toDeg(Math.atan2(y, x)) };
+  const toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI;
+  const φ1=toRad(lat1),λ1=toRad(lon1),φ2=toRad(lat2),λ2=toRad(lon2);
+  const d=2*Math.asin(Math.sqrt(Math.sin((φ2-φ1)/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2));
+  if(d<1e-10) return {lat:lat1,lon:lon1};
+  const A=Math.sin((1-t)*d)/Math.sin(d), B=Math.sin(t*d)/Math.sin(d);
+  const x=A*Math.cos(φ1)*Math.cos(λ1)+B*Math.cos(φ2)*Math.cos(λ2);
+  const y=A*Math.cos(φ1)*Math.sin(λ1)+B*Math.cos(φ2)*Math.sin(λ2);
+  const z=A*Math.sin(φ1)+B*Math.sin(φ2);
+  return {lat:toDeg(Math.atan2(z,Math.sqrt(x*x+y*y))),lon:toDeg(Math.atan2(y,x))};
 }
 
 function bearing(lat1, lon1, lat2, lon2) {
-  const toRad = d => d*Math.PI/180;
-  const φ1=toRad(lat1), φ2=toRad(lat2), Δλ=toRad(lon2-lon1);
+  const toRad=d=>d*Math.PI/180;
+  const φ1=toRad(lat1),φ2=toRad(lat2),Δλ=toRad(lon2-lon1);
   const y=Math.sin(Δλ)*Math.cos(φ2), x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
   return (Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 
 function parseDuration(str) {
-  if (!str) return 0;
-  const parts = String(str).split(':').map(Number);
-  return parts[0] + (parts[1]||0)/60 + (parts[2]||0)/3600;
+  if(!str) return 0;
+  const parts=String(str).split(':').map(Number);
+  return parts[0]+(parts[1]||0)/60+(parts[2]||0)/3600;
 }
 
 function parseTime(str) {
-  if (!str) return 6;
-  const parts = String(str).split(':').map(Number);
-  return parts[0] + (parts[1]||0)/60;
+  if(!str) return 6;
+  const parts=String(str).split(':').map(Number);
+  return parts[0]+(parts[1]||0)/60;
 }
 
 function computePosition(ac, route, airports, nowUTC) {
   const hubICAO  = ac.homeBase;
   const tzOffset = HUB_TZ[hubICAO] || 345;
-  const nowLocal = new Date(nowUTC.getTime() + tzOffset*60000);
-  const localHrs = nowLocal.getUTCHours() + nowLocal.getUTCMinutes()/60 + nowLocal.getUTCSeconds()/3600;
+  const nowLocal = new Date(nowUTC.getTime()+tzOffset*60000);
+  const localHrs = nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
   const jsDow    = nowLocal.getUTCDay();
-  const sheetDow = jsDow === 0 ? 6 : jsDow - 1;
+  const sheetDow = jsDow===0 ? 6 : jsDow-1;
 
   const destStr = ac.schedule[sheetDow];
-  if (!destStr) return { status:'ground', lat:null, lon:null, hubICAO };
+  if(!destStr) return {status:'ground',lat:null,lon:null,hubICAO};
 
-  const dests = destStr.split(',').map(s => s.trim()).filter(Boolean);
-  if (!dests.length) return { status:'ground', lat:null, lon:null, hubICAO };
+  const dests = destStr.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!dests.length) return {status:'ground',lat:null,lon:null,hubICAO};
 
-  const startHrs   = route.startTime !== null ? route.startTime : 6.0;
+  const startHrs   = route.startTime!==null ? route.startTime : 6.0;
   const speedKts   = ac.speed || 447;
   const turnaround = parseDuration(ac.turnaround);
 
   const hubAp = airports[hubICAO];
-  if (!hubAp) return { status:'ground', lat:null, lon:null, hubICAO };
+  if(!hubAp) return {status:'ground',lat:null,lon:null,hubICAO};
 
-  const legs = [];
-  let cursor = startHrs;
+  const legs=[];
+  let cursor=startHrs;
 
-  for (let i = 0; i < dests.length; i++) {
-    const destAp = Object.values(airports).find(a => a.iata === dests[i]);
-    if (!destAp) continue;
-
-    const dist = haversineNmi(hubAp.lat, hubAp.lon, destAp.lat, destAp.lon);
-    const ft   = dist / speedKts + 0.5;
-
-    legs.push({ fromIATA:hubAp.iata, toIATA:dests[i], fromLat:hubAp.lat, fromLon:hubAp.lon, toLat:destAp.lat, toLon:destAp.lon, deptHrs:cursor, arrHrs:cursor+ft });
-    cursor += ft + turnaround;
-
-    legs.push({ fromIATA:dests[i], toIATA:hubAp.iata, fromLat:destAp.lat, fromLon:destAp.lon, toLat:hubAp.lat, toLon:hubAp.lon, deptHrs:cursor, arrHrs:cursor+ft });
-    cursor += ft;
-
-    if (i < dests.length-1) cursor += turnaround;
+  for(let i=0; i<dests.length; i++) {
+    const destAp = Object.values(airports).find(a=>a.iata===dests[i]);
+    if(!destAp) continue;
+    const dist = haversineNmi(hubAp.lat,hubAp.lon,destAp.lat,destAp.lon);
+    const ft   = dist/speedKts+0.5;
+    legs.push({fromIATA:hubAp.iata,toIATA:dests[i],fromLat:hubAp.lat,fromLon:hubAp.lon,toLat:destAp.lat,toLon:destAp.lon,deptHrs:cursor,arrHrs:cursor+ft});
+    cursor+=ft+turnaround;
+    legs.push({fromIATA:dests[i],toIATA:hubAp.iata,fromLat:destAp.lat,fromLon:destAp.lon,toLat:hubAp.lat,toLon:hubAp.lon,deptHrs:cursor,arrHrs:cursor+ft});
+    cursor+=ft;
+    if(i<dests.length-1) cursor+=turnaround;
   }
 
-  if (localHrs < startHrs) return { status:'ground', lat:hubAp.lat, lon:hubAp.lon, hubICAO, hubIATA:hubAp.iata };
+  if(localHrs<startHrs) return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO,hubIATA:hubAp.iata};
 
-  for (let i = 0; i < legs.length; i++) {
-    const leg = legs[i];
-    if (localHrs >= leg.deptHrs && localHrs < leg.arrHrs) {
-      const t   = (localHrs - leg.deptHrs) / (leg.arrHrs - leg.deptHrs);
-      const pos = greatCircleInterp(leg.fromLat, leg.fromLon, leg.toLat, leg.toLon, t);
-      return { status:'airborne', lat:pos.lat, lon:pos.lon, heading:bearing(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon), fromIATA:leg.fromIATA, toIATA:leg.toIATA, deptHrs:leg.deptHrs, arrHrs:leg.arrHrs, hubICAO };
+  for(let i=0; i<legs.length; i++) {
+    const leg=legs[i];
+    if(localHrs>=leg.deptHrs && localHrs<leg.arrHrs) {
+      const t=(localHrs-leg.deptHrs)/(leg.arrHrs-leg.deptHrs);
+      const pos=greatCircleInterp(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon,t);
+      return {status:'airborne',lat:pos.lat,lon:pos.lon,heading:bearing(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon),fromIATA:leg.fromIATA,toIATA:leg.toIATA,deptHrs:leg.deptHrs,arrHrs:leg.arrHrs,hubICAO};
     }
-    if (i < legs.length-1 && localHrs >= leg.arrHrs && localHrs < legs[i+1].deptHrs) {
-      return { status:'ground', lat:leg.toLat, lon:leg.toLon, atIATA:leg.toIATA, hubICAO };
+    if(i<legs.length-1 && localHrs>=leg.arrHrs && localHrs<legs[i+1].deptHrs) {
+      return {status:'ground',lat:leg.toLat,lon:leg.toLon,atIATA:leg.toIATA,hubICAO};
     }
   }
-
-  return { status:'ground', lat:hubAp.lat, lon:hubAp.lon, hubICAO, hubIATA:hubAp.iata };
+  return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO,hubIATA:hubAp.iata};
 }
 </script>
 
@@ -340,203 +199,182 @@ const SHEETS = {
 };
 
 const HUB_TZ = {
-  VNKT: 345, VQPR: 360, VEGT: 330, ZULS: 480,
-  VNPR: 345, VNBW: 345, VILH: 330, OPSD: 300,
+  VNKT:345, VQPR:360, VEGT:330, ZULS:480,
+  VNPR:345, VNBW:345, VILH:330, OPSD:300,
 };
 
 function sheetUrl(name) {
   return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;
 }
 
-// ── CLOCK ─────────────────────────────────────
-
 function pad(n) { return String(n).padStart(2,'0'); }
 function formatTime(d) { return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`; }
 
 function updateClocks() {
-  const now = new Date();
+  const now=new Date();
   document.getElementById('clock-npt').textContent   = formatTime(new Date(now.getTime()+345*60000));
   document.getElementById('clock-utc').textContent   = formatTime(now);
   document.getElementById('clock-local').textContent = now.toLocaleTimeString('en-GB');
 }
-    setInterval(updateClocks, 1000);
-    updateClocks();
+setInterval(updateClocks,1000);
+updateClocks();
 
-    // ── MAP ───────────────────────────────────────
+const map=L.map('map',{center:[27.5,87],zoom:5});
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);
 
-    const map = L.map('map', { center: [27.5, 87], zoom: 5 });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
+async function fetchSheet(name) {
+  const resp=await fetch(sheetUrl(name));
+  const text=await resp.text();
+  const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+  return json.table;
+}
 
-    // ── DATA ──────────────────────────────────────
+function tableToObjects(table) {
+  const headers=table.cols.map(c=>c.label);
+  return table.rows
+    .filter(r=>r&&r.c&&r.c.some(c=>c&&c.v!==null))
+    .map(r=>{
+      const obj={};
+      headers.forEach((h,i)=>{obj[h]=r.c[i]?r.c[i].v:null;});
+      return obj;
+    });
+}
 
-    async function fetchSheet(name) {
-        const resp = await fetch(sheetUrl(name));
-        const text = await resp.text();
-        const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
-        return json.table;
-    }
+function statusClass(s) {
+  if(!s) return 'status-delivered';
+  const l=s.toLowerCase();
+  if(l.includes('service')||l==='online') return 'status-online';
+  if(l.includes('maintenance'))           return 'status-maintenance';
+  if(l.includes('waiting'))               return 'status-waiting';
+  return 'status-delivered';
+}
 
-    function tableToObjects(table) {
-        const headers = table.cols.map(c => c.label);
-        return table.rows
-            .filter(r => r && r.c && r.c.some(c => c && c.v !== null))
-            .map(r => {
-                const obj = {};
-                headers.forEach((h, i) => { obj[h] = r.c[i] ? r.c[i].v : null; });
-                return obj;
-            });
-    }
+function statusLabel(s) {
+  if(!s) return 'Delivered';
+  const l=s.toLowerCase();
+  if(l.includes('service')||l==='online') return 'Online';
+  if(l.includes('maintenance'))           return 'Maintenance';
+  if(l.includes('waiting'))               return 'Waiting';
+  return s;
+}
 
-    // ── STATUS ────────────────────────────────────
+function planeIcon(isAirborne, heading) {
+  const html=`<div style="width:20px;height:20px;background:${isAirborne?'#F7B500':'#c7c9d3'};border:2px solid ${isAirborne?'#c7c9d3':'#5c158a'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transform:rotate(${heading||0}deg);">✈</div>`;
+  return L.divIcon({html,className:'',iconSize:[20,20],iconAnchor:[10,10]});
+}
 
-    function statusClass(s) {
-        if (!s) return 'status-delivered';
-        const l = s.toLowerCase();
-        if (l.includes('service') || l === 'online') return 'status-online';
-        if (l.includes('maintenance')) return 'status-maintenance';
-        if (l.includes('waiting')) return 'status-waiting';
-        return 'status-delivered';
-    }
+function makeAirportMarker(ap) {
+  const isHub=Object.keys(HUB_TZ).includes(ap.icao);
+  const marker=L.circleMarker([ap.lat,ap.lon],{
+    radius:isHub?7:5, fillColor:isHub?'#BFA2DC':'#5c158a',
+    color:isHub?'#c7c9d3':'#BFA2DC', weight:1.5, fillOpacity:isHub?1:0.85,
+  }).addTo(map);
+  marker.bindPopup(`<div class="popup-iata">${ap.iata}</div><div class="popup-name">${ap.name||''}</div><div class="popup-icao">${ap.icao||''}</div>`);
+  return marker;
+}
 
-    function statusLabel(s) {
-        if (!s) return 'Delivered';
-        const l = s.toLowerCase();
-        if (l.includes('service') || l === 'online') return 'Online';
-        if (l.includes('maintenance')) return 'Maintenance';
-        if (l.includes('waiting')) return 'Waiting';
-        return s;
-    }
+async function init() {
+  try {
+    console.log('Init started');
 
-    // ── PLANE ICON ────────────────────────────────
+    // Fleet
+    document.getElementById('loading-msg').textContent='Loading fleet...';
+    const fleetRaw=tableToObjects(await fetchSheet(SHEETS.fleet));
+    const fleet=fleetRaw.filter(r=>r['Fleet Information Aircraft Type']&&r['Registration']);
+    console.log('Fleet loaded:',fleet.length,'aircraft');
 
-    function planeIcon(isAirborne, heading) {
-        const html = `<div style="width:20px;height:20px;background:${isAirborne ? '#F7B500' : '#c7c9d3'};border:2px solid ${isAirborne ? '#c7c9d3' : '#5c158a'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transform:rotate(${heading || 0}deg);">✈</div>`;
-        return L.divIcon({ html, className: '', iconSize: [20, 20], iconAnchor: [10, 10] });
-    }
-
-    // ── AIRPORT MARKERS ───────────────────────────
-
-    function makeAirportMarker(ap) {
-        const isHub = Object.keys(HUB_TZ).includes(ap['ICAO']);
-        const marker = L.circleMarker([ap['Lat.'], ap['Lon']], {
-            radius: isHub ? 7 : 5, fillColor: isHub ? '#BFA2DC' : '#5c158a',
-            color: isHub ? '#c7c9d3' : '#BFA2DC', weight: 1.5, fillOpacity: isHub ? 1 : 0.85,
-        }).addTo(map);
-        marker.bindPopup(`<div class="popup-iata">${ap['IATA']}</div><div class="popup-name">${ap['Airport Name'] || ''}</div><div class="popup-icao">${ap['ICAO'] || ''}</div>`);
-        return marker;
-    }
-
-    // ── INIT ──────────────────────────────────────
-
-    async function init() {
-        try {
-            console.log('Init started');
-
-            // Fleet
-            document.getElementById('loading-msg').textContent = 'Loading fleet...';
-            const fleetRaw = tableToObjects(await fetchSheet(SHEETS.fleet));
-            const fleet = fleetRaw.filter(r => r['Fleet Information Aircraft Type'] && r['Registration']);
-            console.log('Fleet loaded:', fleet.length, 'aircraft');
-
-            const listEl = document.getElementById('fleet-list');
-            listEl.innerHTML = '';
-            fleet.forEach(ac => {
-                const div = document.createElement('div');
-                div.className = 'fleet-item';
-                div.innerHTML = `
+    const listEl=document.getElementById('fleet-list');
+    listEl.innerHTML='';
+    fleet.forEach(ac=>{
+      const div=document.createElement('div');
+      div.className='fleet-item';
+      div.innerHTML=`
         <div class="fleet-item-left">
           <div class="fleet-reg">${ac['Registration']}</div>
           <div class="fleet-type">${ac['Fleet Information Aircraft Type']}</div>
-          <div class="fleet-base">${ac['Home Base'] || '—'}</div>
+          <div class="fleet-base">${ac['Home Base']||'—'}</div>
         </div>
-        <div class="fleet-status ${statusClass(ac['Status'])}">${statusLabel(ac['Status'])}</div>
-      `;
-                listEl.appendChild(div);
-            });
-            document.getElementById('fleet-count').textContent = `${fleet.length} aircraft`;
+        <div class="fleet-status ${statusClass(ac['Status'])}">${statusLabel(ac['Status'])}</div>`;
+      listEl.appendChild(div);
+    });
+    document.getElementById('fleet-count').textContent=`${fleet.length} aircraft`;
 
-            // Airports
-            const airports = tableToObjects(await fetchSheet(SHEETS.airports))
-                .filter(r => r['Airport Information IATA'] && r['Lat.'] && r['Lon.']);
+    // Airports
+    document.getElementById('loading-msg').textContent='Loading airports...';
+    const airportsRaw=tableToObjects(await fetchSheet(SHEETS.airports))
+      .filter(r=>r['Airport Information IATA']&&r['Lat.']&&r['Lon.']);
+    console.log('Airports loaded:',airportsRaw.length);
 
-            // Airport lookup
-            airports.forEach(ap => {
-                airportsByICAO[ap['ICAO']] = { lat: ap['Lat.'], lon: ap['Lon.'], iata: ap['Airport Information IATA'], icao: ap['ICAO'], name: ap['Airport Name'] };
-            });
+    const airportsByICAO={};
+    airportsRaw.forEach(ap=>{
+      const obj={lat:ap['Lat.'],lon:ap['Lon.'],iata:ap['Airport Information IATA'],icao:ap['ICAO'],name:ap['Airport Name']};
+      airportsByICAO[ap['ICAO']]=obj;
+      makeAirportMarker(obj);
+    });
 
-            // Airport markers
-            function makeAirportMarker(ap) {
-                const isHub = Object.keys(HUB_TZ).includes(ap['ICAO']);
-                const marker = L.circleMarker([ap['Lat.'], ap['Lon.']], {
-                    ...
-  });
-                marker.bindPopup(`
-    <div class="popup-iata">${ap['Airport Information IATA']}</div>
-    ...
-  `);
-            }
+    // Routes
+    document.getElementById('loading-msg').textContent='Loading routes...';
+    const routesRaw=tableToObjects(await fetchSheet(SHEETS.routes))
+      .filter(r=>r['Route Master List No.']&&r['Route']);
+    console.log('Routes loaded:',routesRaw.length);
 
-            // Routes
-            const routesRaw = tableToObjects(await fetchSheet(SHEETS.routes))
-                .filter(r => r['Route Master List No.'] && r['Route']);
+    const routeMap={};
+    routesRaw.forEach(r=>{
+      routeMap[r['Route Master List No.']]={
+        id:        r['Route Master List No.'],
+        hub:       r['Hub'],
+        dests:     r['Route'],
+        startTime: r['Start Time (LT)'] ? parseTime(r['Start Time (LT)']) : 6.0,
+      };
+    });
 
-            routesRaw.forEach(r => {
-                routeMap[r['Route Master List No.']] = {
-                    id: r['Route Master List No.'],
-                    hub: r['Hub'],
-                    dests: r['Route'],
-                    startTime: r['Start Time (LT)'] ? parseTime(r['Start Time (LT)']) : 6.0,
-                };
-            });
+    // Schedule
+    document.getElementById('loading-msg').textContent='Loading schedule...';
+    const scheduleRaw=tableToObjects(await fetchSheet(SHEETS.schedule))
+      .filter(r=>r['Aircraft']&&r['Aircraft Schedule Aircraft Type']);
+    console.log('Schedule rows:',scheduleRaw.length);
 
-            // Schedule
-            document.getElementById('loading-msg').textContent = 'Loading schedule...';
-            const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
-      .filter(r => r['Aircraft'] && r['Aircraft Schedule Aircraft Type']);
-    console.log('Schedule rows:', scheduleRaw.length);
-
-    const aircraftData = [];
-    scheduleRaw.forEach(row => {
-      const reg      = row['Aircraft'];
-      const fleetRow = fleet.find(f => f['Registration'] === reg);
-      if (!fleetRow) return;
-
+    const aircraftData=[];
+    scheduleRaw.forEach(row=>{
+      const reg=row['Aircraft'];
+      const fleetRow=fleet.find(f=>f['Registration']===reg);
+      if(!fleetRow) return;
       aircraftData.push({
         reg,
         type:       row['Aircraft Schedule Aircraft Type'],
         homeBase:   row['Homebase'],
         status:     fleetRow['Status'],
-        speed:      parseFloat(fleetRow['Average Cruise Speed [kts]']) || 447,
-        turnaround: fleetRow['Turnaround Time'] || '0:45:00',
+        speed:      parseFloat(fleetRow['Average Cruise Speed [kts]'])||447,
+        turnaround: fleetRow['Turnaround Time']||'0:45:00',
         schedule:   [row['Monday'],row['Tuesday'],row['Wednesday'],row['Thursday'],row['Friday'],row['Saturday'],row['Sunday']],
         routeNums:  [row['M'],row['Tu'],row['W'],row['Th'],row['F'],row['Sa'],row['Su']],
       });
     });
-    console.log('Aircraft data built:', aircraftData.length);
+    console.log('Aircraft data built:',aircraftData.length);
 
     // Place markers
-    const planeMarkers = {};
-    aircraftData.forEach(ac => {
-      if (!ac.homeBase) return;
-      const hubAp = airportsByICAO[ac.homeBase];
-      if (!hubAp) return;
+    const planeMarkers={};
+    aircraftData.forEach(ac=>{
+      if(!ac.homeBase) return;
+      const hubAp=airportsByICAO[ac.homeBase];
+      if(!hubAp) return;
 
-      const now      = new Date();
-      const jsDow    = new Date(now.getTime()+(HUB_TZ[ac.homeBase]||345)*60000).getUTCDay();
-      const sheetDow = jsDow===0 ? 6 : jsDow-1;
-      const routeNum = ac.routeNums[sheetDow];
-      const route    = routeNum ? routeMap[routeNum] : null;
+      const now=new Date();
+      const jsDow=new Date(now.getTime()+(HUB_TZ[ac.homeBase]||345)*60000).getUTCDay();
+      const sheetDow=jsDow===0?6:jsDow-1;
+      const routeNum=ac.routeNums[sheetDow];
+      const route=routeNum?routeMap[routeNum]:null;
 
-      const pos = route
-        ? computePosition(ac, route, airportsByICAO, now)
-        : { status:'ground', lat:hubAp.lat, lon:hubAp.lon };
+      const pos=route
+        ?computePosition(ac,route,airportsByICAO,now)
+        :{status:'ground',lat:hubAp.lat,lon:hubAp.lon};
 
-      if (pos.lat === null) { pos.lat = hubAp.lat; pos.lon = hubAp.lon; }
+      if(pos.lat===null){pos.lat=hubAp.lat;pos.lon=hubAp.lon;}
 
-      const isAirborne = pos.status === 'airborne';
-      const marker = L.marker([pos.lat, pos.lon], { icon: planeIcon(isAirborne, pos.heading) }).addTo(map);
+      const isAirborne=pos.status==='airborne';
+      const marker=L.marker([pos.lat,pos.lon],{icon:planeIcon(isAirborne,pos.heading)}).addTo(map);
 
-      const fmtHrs = h => h !== undefined ? `${Math.floor(h)}:${pad(Math.round((h%1)*60))}` : '—';
+      const fmtHrs=h=>h!==undefined?`${Math.floor(h)}:${pad(Math.round((h%1)*60))}`:'—';
 
       marker.bindPopup(`
         <div class="popup-iata">${ac.reg}</div>
@@ -544,38 +382,37 @@ function updateClocks() {
         <div class="popup-icao">Base: ${ac.homeBase}</div>
         <div class="popup-icao" style="margin-top:6px;">
           ${isAirborne
-            ? `✈ ${pos.fromIATA} → ${pos.toIATA}<br>Dep: ${fmtHrs(pos.deptHrs)} &nbsp; Arr: ${fmtHrs(pos.arrHrs)} LT`
-            : `On ground${pos.atIATA ? ' at '+pos.atIATA : ''}`
+            ?`✈ ${pos.fromIATA} → ${pos.toIATA}<br>Dep: ${fmtHrs(pos.deptHrs)} &nbsp; Arr: ${fmtHrs(pos.arrHrs)} LT`
+            :`On ground${pos.atIATA?' at '+pos.atIATA:''}`
           }
         </div>
-        ${routeNum ? `<div class="popup-icao" style="margin-top:4px;">Route: ${routeNum}</div>` : ''}
+        ${routeNum?`<div class="popup-icao" style="margin-top:4px;">Route: ${routeNum}</div>`:''}
       `);
 
-      planeMarkers[ac.reg] = { marker, ac, route };
+      planeMarkers[ac.reg]={marker,ac,route};
     });
-
-    console.log('Plane markers placed:', Object.keys(planeMarkers).length);
+    console.log('Plane markers placed:',Object.keys(planeMarkers).length);
 
     // Update every 30s
-    setInterval(() => {
-      const now = new Date();
-      Object.values(planeMarkers).forEach(({ marker, ac, route }) => {
-        if (!route) return;
-        const hubAp = airportsByICAO[ac.homeBase];
-        if (!hubAp) return;
-        const pos = computePosition(ac, route, airportsByICAO, now);
-        if (pos.lat === null) return;
-        marker.setLatLng([pos.lat, pos.lon]);
-        marker.setIcon(planeIcon(pos.status==='airborne', pos.heading));
+    setInterval(()=>{
+      const now=new Date();
+      Object.values(planeMarkers).forEach(({marker,ac,route})=>{
+        if(!route) return;
+        const hubAp=airportsByICAO[ac.homeBase];
+        if(!hubAp) return;
+        const pos=computePosition(ac,route,airportsByICAO,now);
+        if(pos.lat===null) return;
+        marker.setLatLng([pos.lat,pos.lon]);
+        marker.setIcon(planeIcon(pos.status==='airborne',pos.heading));
       });
-    }, 30000);
+    },30000);
 
-    document.getElementById('loading').style.display = 'none';
+    document.getElementById('loading').style.display='none';
 
   } catch(err) {
-    console.error('INIT ERROR:', err);
-    console.error('Stack:', err.stack);
-    document.getElementById('loading-msg').textContent = 'Error: ' + err.message;
+    console.error('INIT ERROR:',err);
+    console.error('Stack:',err.stack);
+    document.getElementById('loading-msg').textContent='Error: '+err.message;
   }
 }
 
