@@ -393,7 +393,7 @@ function drawFlightArc(leg,progress){
   const elapsed=allPts.slice(0,splitIdx+1);
   const remaining=allPts.slice(splitIdx);
   if(elapsed.length>1){
-    const l=L.polyline(elapsed,{color:'#5c158a',weight:2.5,opacity:0.9}).addTo(map);
+    const l=L.polyline(elapsed,{color:'#5c158a',weight:2.5,opacity:0.9}).addTo(map); l.bringToBack();
     activeArcs.push(l);
   }
   if(remaining.length>1){
