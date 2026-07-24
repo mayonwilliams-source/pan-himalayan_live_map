@@ -23,7 +23,7 @@
       --bg:        #000000;
       --bg2:       #000000;
       --bg3:       #0a0208;       
-      --border:    #BFA2DC;
+      --border:    #5c158a;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -741,38 +741,32 @@ async function init() {
       };
     });
 
-    document.getElementById('loading-msg').textContent = 'Loading schedule...';
-    const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
-      .filter(r => r['Aircraft'] && r['Aircraft Type']);
+      document.getElementById('loading-msg').textContent = 'Loading schedule...';
+      const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
+          .filter(r => r['Aircraft'] && r['Aircraft Schedule Aircraft Type']);
 
-      // Build per-aircraft data structure
-      const aircraftData = [];
       scheduleRaw.forEach(row => {
-          console.log('Schedule raw:', scheduleRaw.slice(0, 2));
-          console.log('Route map:', routeMap);
-          console.log('Fleet:', fleet.slice(0, 2));
           const reg = row['Aircraft'];
-      const fleetRow = fleet.find(f => f['Registration'] === reg);
-      if (!fleetRow) return;
+          const fleetRow = fleet.find(f => f['Registration'] === reg);
+          if (!fleetRow) return;
 
-      // Schedule: 7 days, index 0=Mon
-      const schedule    = [row['Monday'],row['Tuesday'],row['Wednesday'],row['Thursday'],row['Friday'],row['Saturday'],row['Sunday']];
-      const routeNums   = [row['M'],row['Tu'],row['W'],row['Th'],row['F'],row['Sa'],row['Su']];
+          const schedule = [row['Monday'], row['Tuesday'], row['Wednesday'], row['Thursday'], row['Friday'], row['Saturday'], row['Sunday']];
+          const routeNums = [row['M'], row['Tu'], row['W'], row['Th'], row['F'], row['Sa'], row['Su']];
 
-      aircraftData.push({
-        reg,
-        type:       fleetRow['Aircraft Type'],
-        homeBase:   fleetRow['Home Base'],
-        status:     fleetRow['Status'],
-        speed:      parseFloat(fleetRow['Average Cruise Speed [kts]']) || 447,
-        turnaround: fleetRow['Turnaround Time'] || '0:45:00',
-        schedule,
-        routeNums,
+          aircraftData.push({
+              reg,
+              type: fleetRow['Fleet Information Aircraft Type'],
+              homeBase: fleetRow['Home Base'],
+              status: fleetRow['Status'],
+              speed: parseFloat(fleetRow['Average Cruise Speed [kts]']) || 447,
+              turnaround: fleetRow['Turnaround Time'] || '0:45:00',
+              schedule,
+              routeNums,
+          });
       });
-    });
 
-    // Place aircraft markers
-    const planeMarkers = {};
+      // Place aircraft markers
+   const planeMarkers = {};
     aircraftData.forEach(ac => {
       if (!ac.homeBase) return;
       const hubAp = airportsByICAO[ac.homeBase];
