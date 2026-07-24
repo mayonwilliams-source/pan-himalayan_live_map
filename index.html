@@ -90,8 +90,7 @@
     .leg-item.current .leg-route { color:var(--lilac); }
 
     /* Leaflet */
-    .leaflet-container { background:var(--bg); }
-    .leaflet-tile { filter:brightness(0.45) saturate(0.3) hue-rotate(210deg); }
+    .leaflet-container { background:var(--bg);
     .leaflet-control-zoom a { background:var(--bg2) !important; color:var(--mist) !important; border-color:var(--border) !important; }
     .leaflet-control-zoom a:hover { background:var(--bg3) !important; }
     .leaflet-control-attribution { background:rgba(10,2,8,0.85) !important; color:#333 !important; font-size:9px !important; }
@@ -327,7 +326,10 @@ function toggleSidebar(){
 // ── MAP ───────────────────────────────────────
 
 const map=L.map('map',{center:[27.5,87],zoom:5});
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© OpenStreetMap © CARTO',
+  maxZoom:19
+}).addTo(map);
 
 async function fetchSheet(name){
   const resp=await fetch(sheetUrl(name));
