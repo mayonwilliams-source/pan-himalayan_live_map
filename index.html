@@ -164,10 +164,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <script>
+  const HUB_TZ={VNKT:345,VQPR:360,VEGT:330,ZULS:480,VNPR:345,VNBW:345,VILH:330,OPSD:300};
+  
 console.log('HUB_TZ defined:', typeof HUB_TZ);
 console.log('Current NPT hour:', new Date(new Date().getTime()+345*60000).getUTCHours());
 // ── POSITION ENGINE ───────────────────────────
 
+  
 function haversineNmi(lat1,lon1,lat2,lon2){
   const R=3440.065,phi1=lat1*Math.PI/180,phi2=lat2*Math.PI/180;
   const dphi=(lat2-lat1)*Math.PI/180,dlam=(lon2-lon1)*Math.PI/180;
@@ -329,7 +332,6 @@ function getConnectedIATAs(iata,routeMap,airports){
 <script>
 const SHEET_ID='1Gn2t_5jhLf_gPHJN5ojSX270ImGtH2EYZi4HbwDgZJk';
 const SHEETS={fleet:'Fleet Information',airports:'Airport Information',routes:'Routes Master List',schedule:'Aircraft Schedule'};
-const HUB_TZ={VNKT:345,VQPR:360,VEGT:330,ZULS:480,VNPR:345,VNBW:345,VILH:330,OPSD:300};
 
 function sheetUrl(name){return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;}
 function pad(n){return String(n).padStart(2,'0');}
