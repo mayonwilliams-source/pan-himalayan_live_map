@@ -297,19 +297,30 @@ function getAirportLegsInWindow(iata,aircraftData,routeMap,airports,nowUTC,pastH
     }
   });
   return {deps,arrs,ground};
-}
-function getConnectedIATAs(iata,routeMap,airports){
+  function getConnectedIATAs(iata,routeMap,airports){
   const connected=new Set();
   const ap=Object.values(airports).find(a=>a.iata===iata);
   const isHub=ap&&Object.keys(HUB_TZ).includes(ap.icao);
+
   Object.values(routeMap).forEach(route=>{
     const dests=route.dests.split(',').map(s=>s.trim());
-    if(isHub&&route.hub===iata){
-      dests.forEach(d=>connected.add(d));
-    } else if(!isHub&&dests.includes(iata)){
-      connected.add(route.hub);
+    if(isHub){
+      // Direction 1: this hub originates the route
+      if(route.hub===iata){
+        dests.forEach(d=>connected.add(d));
+      }
+      // Direction 2: this hub appears as a destination in another hub's route
+      if(dests.includes(iata)){
+        connected.add(route.hub);
+      }
+    } else {
+      // Non-hub: only connect to the originating hub of any route it appears in
+      if(dests.includes(iata)){
+        connected.add(route.hub);
+      }
     }
   });
+
   connected.delete(iata);
   return connected;
 }
