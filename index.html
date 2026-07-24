@@ -14,7 +14,6 @@
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'Alegreya Sans',sans-serif; background:var(--bg); color:var(--mist); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-
     #topbar { display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0; z-index:1000; }
     .brand { display:flex; align-items:baseline; gap:12px; }
     .brand-name { font-family:'Marcellus SC',serif; font-size:18px; font-weight:600; letter-spacing:1.5px; color:var(--mist); }
@@ -24,24 +23,17 @@
     .tz .label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--lilac); }
     .tz .time { font-size:15px; font-weight:600; color:var(--zanskar); font-variant-numeric:tabular-nums; letter-spacing:1px; }
     #fleet-count { font-size:12px; color:#444; letter-spacing:1px; }
-
     #main { display:flex; flex:1; overflow:hidden; position:relative; }
     #map { flex:1; background:var(--bg); }
-
-    /* ── Left sidebar ── */
     #sidebar { width:var(--sidebar-w); background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; transition:width 0.3s,opacity 0.3s; position:relative; z-index:500; }
     #sidebar.collapsed { width:0; opacity:0; pointer-events:none; }
     #sidebar-toggle { position:absolute; left:var(--sidebar-w); top:50%; transform:translateY(-50%); z-index:600; width:18px; height:48px; background:var(--bg2); border:1px solid var(--border); border-left:none; border-radius:0 6px 6px 0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--lilac); font-size:10px; transition:left 0.3s; }
     #sidebar-toggle.collapsed { left:0; border-left:1px solid var(--border); border-right:none; border-radius:6px 0 0 6px; }
-
     .sidebar-header { font-family:'Marcellus SC',serif; font-size:16px; letter-spacing:3px; text-transform:uppercase; color:var(--lilac); padding:16px 16px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
-
     #fleet-list { overflow-y:auto; flex:1; }
     #fleet-list::-webkit-scrollbar { width:4px; }
     #fleet-list::-webkit-scrollbar-track { background:var(--bg2); }
     #fleet-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
-
-    /* Type group */
     .type-group { border-bottom:1px solid var(--border); }
     .type-group-header { display:flex; justify-content:space-between; align-items:center; padding:9px 16px; cursor:pointer; background:var(--bg3); transition:background 0.15s; font-family:'Marcellus SC',serif; font-size:11px; letter-spacing:1px; color:var(--lilac); }
     .type-group-header:hover { background:#110818; }
@@ -50,8 +42,6 @@
     .type-group.open .type-chevron { transform:rotate(90deg); }
     .type-group-body { display:none; }
     .type-group.open .type-group-body { display:block; }
-
-    /* Fleet cards */
     .fleet-item { border-bottom:1px solid #1a0a2a; cursor:pointer; }
     .fleet-item-header { padding:9px 16px; display:flex; justify-content:space-between; align-items:flex-start; transition:background 0.15s; }
     .fleet-item-header:hover { background:var(--bg3); }
@@ -69,8 +59,6 @@
     .info-label { color:#665577; font-size:11px; }
     .info-val { color:var(--mist); font-size:12px; }
     .maintenance-msg { color:var(--red); font-size:12px; margin-top:4px; }
-
-    /* ── Right info panel ── */
     #info-panel { width:0; background:var(--bg2); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; transition:width 0.3s; z-index:500; }
     #info-panel.open { width:var(--panel-w); }
     #info-panel-inner { width:var(--panel-w); display:flex; flex-direction:column; height:100%; overflow:hidden; }
@@ -82,15 +70,12 @@
     #info-panel-body::-webkit-scrollbar { width:4px; }
     #info-panel-body::-webkit-scrollbar-track { background:var(--bg2); }
     #info-panel-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
-
-    /* Tabs */
-    .tab-bar { display:flex; border-bottom:1px solid var(--border); flex-shrink:0; }
+    .tab-bar { display:flex; border-bottom:1px solid var(--border); flex-shrink:0; margin:0 -16px; padding:0 16px; }
     .tab { flex:1; padding:9px 4px; text-align:center; font-size:11px; letter-spacing:1px; font-family:'Marcellus SC',serif; color:#554466; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; }
     .tab:hover { color:var(--mist); }
     .tab.active { color:var(--lilac); border-bottom-color:var(--lilac); }
-    .tab-content { display:none; overflow-y:auto; flex:1; padding:12px 16px; }
+    .tab-content { display:none; padding-top:12px; }
     .tab-content.active { display:block; }
-
     .panel-section { margin-bottom:16px; }
     .panel-section-title { font-family:'Marcellus SC',serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--zanskar); margin-bottom:8px; border-bottom:1px solid var(--border); padding-bottom:4px; }
     .panel-row { display:flex; justify-content:space-between; margin-bottom:3px; }
@@ -100,20 +85,16 @@
     .panel-type { font-size:13px; color:#887799; margin-bottom:12px; }
     .panel-iata { font-family:'Marcellus SC',serif; font-size:26px; color:var(--lilac); letter-spacing:3px; margin-bottom:2px; }
     .panel-airport-name { font-size:12px; color:#887799; margin-bottom:12px; }
-
     .leg-item { padding:6px 0; border-bottom:1px solid #1a0a2a; font-size:11px; }
     .leg-item:last-child { border-bottom:none; }
     .leg-route { color:var(--mist); font-weight:600; margin-bottom:2px; }
     .leg-time { color:#665577; }
-    .leg-item.current { background:rgba(92,21,138,0.15); padding:6px 8px; border-radius:4px; margin:-2px -8px; }
+    .leg-item.current { background:rgba(92,21,138,0.15); padding:6px 8px; border-radius:4px; margin:0 -8px; }
     .leg-item.current .leg-route { color:var(--lilac); }
-
     .ac-ground-item { padding:6px 0; border-bottom:1px solid #1a0a2a; font-size:11px; }
     .ac-ground-item:last-child { border-bottom:none; }
     .ac-ground-reg { font-family:'Marcellus SC',serif; color:var(--mist); font-size:12px; }
     .ac-ground-type { color:#665577; font-size:10px; margin-top:1px; }
-
-    /* Leaflet */
     .leaflet-container { background:var(--bg); }
     .leaflet-control-zoom a { background:var(--bg2) !important; color:var(--mist) !important; border-color:var(--border) !important; }
     .leaflet-control-zoom a:hover { background:var(--bg3) !important; }
@@ -123,7 +104,6 @@
     .leaflet-popup-tip { background:var(--bg2) !important; }
     .leaflet-popup-content { font-size:13px; line-height:1.6; margin:10px 14px !important; }
     .leaflet-tooltip { background:var(--bg2) !important; border:1px solid var(--border) !important; color:var(--mist) !important; font-family:'Alegreya Sans',sans-serif !important; font-size:11px !important; }
-
     #loading { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; gap:20px; }
     #loading .logo { font-family:'Marcellus SC',serif; font-size:26px; font-weight:600; color:var(--mist); letter-spacing:2px; }
     #loading .tagline { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--lilac); }
@@ -289,41 +269,38 @@ function getLegsInWindow(ac,routeMap,airports,nowUTC,pastHrs,futureHrs){
   }
   return results.sort((a,b)=>a.deptHrs-b.deptHrs);
 }
-
-// Get all legs touching a given IATA across ALL aircraft in window
 function getAirportLegsInWindow(iata,aircraftData,routeMap,airports,nowUTC,pastHrs,futureHrs){
   const deps=[],arrs=[],ground=[];
   aircraftData.forEach(ac=>{
     const legs=getLegsInWindow(ac,routeMap,airports,nowUTC,pastHrs,futureHrs);
-    const hubICAO=ac.homeBase;
-    const tzOffset=HUB_TZ[hubICAO]||345;
-    const nowLocal=new Date(nowUTC.getTime()+tzOffset*60000);
+    const tz=HUB_TZ[ac.homeBase]||345;
+    const nowLocal=new Date(nowUTC.getTime()+tz*60000);
     const nowHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
     legs.forEach(leg=>{
       if(leg.fromIATA===iata) deps.push({ac,leg,nowHrs});
       if(leg.toIATA===iata)   arrs.push({ac,leg,nowHrs});
     });
-    // Check if on ground at this airport right now
-    const pos=window.posCache[ac.reg];
+    const pos=window.posCache?.[ac.reg];
     if(pos&&pos.status==='ground'){
-      const atIATA=pos.atIATA||pos.hubIATA;
-      const hubAp=airports[hubICAO];
-      if(atIATA===iata||(hubAp&&hubAp.iata===iata&&!pos.atIATA)) ground.push(ac);
+      const hubAp=airports[ac.homeBase];
+      const atIATA=pos.atIATA||(hubAp?hubAp.iata:null);
+      if(atIATA===iata) ground.push(ac);
     }
   });
   return {deps,arrs,ground};
 }
-
-// Get all connected IATAs for an airport
-function getConnectedIATAs(iata,routeMap){
+function getConnectedIATAs(iata,routeMap,airports){
   const connected=new Set();
+  const ap=Object.values(airports).find(a=>a.iata===iata);
+  const isHub=ap&&Object.keys(HUB_TZ).includes(ap.icao);
   Object.values(routeMap).forEach(route=>{
     const dests=route.dests.split(',').map(s=>s.trim());
-    if(route.hub===iata){
+    if(isHub&&route.hub===iata){
+      // Hub: show all destinations in its own routes
       dests.forEach(d=>connected.add(d));
-    } else if(dests.includes(iata)){
+    } else if(!isHub&&dests.includes(iata)){
+      // Non-hub: only connect to the originating hub
       connected.add(route.hub);
-      dests.forEach(d=>{if(d!==iata) connected.add(d);});
     }
   });
   connected.delete(iata);
@@ -362,7 +339,6 @@ function toggleSidebar(){
   btn.classList.toggle('collapsed',collapsed);
   btn.innerHTML=collapsed?'&#9654;':'&#9664;';
 }
-
 function collapseSidebar(){
   const sb=document.getElementById('sidebar');
   const btn=document.getElementById('sidebar-toggle');
@@ -411,29 +387,17 @@ function planeIcon(heading){
   return L.divIcon({html:svg,className:'',iconSize:[24,24],iconAnchor:[12,12]});
 }
 
-// ── ARCS ─────────────────────────────────────
-
 let activeArcs=[];
 function clearArcs(){activeArcs.forEach(l=>map.removeLayer(l));activeArcs=[];}
-
 function drawFlightArc(leg,progress){
   clearArcs();
   const allPts=gcPoints(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon,80);
   const splitIdx=Math.round(progress*80);
   const elapsed=allPts.slice(0,splitIdx+1);
   const remaining=allPts.slice(splitIdx);
-  if(elapsed.length>1){
-    const l=L.polyline(elapsed,{color:'#5c158a',weight:2.5,opacity:0.9}).addTo(map);
-    l.bringToBack();
-    activeArcs.push(l);
-  }
-  if(remaining.length>1){
-    const l=L.polyline(remaining,{color:'#BFA2DC',weight:2,opacity:0.7,dashArray:'5,5'}).addTo(map);
-    l.bringToBack();
-    activeArcs.push(l);
-  }
+  if(elapsed.length>1){const l=L.polyline(elapsed,{color:'#5c158a',weight:2.5,opacity:0.9}).addTo(map);l.bringToBack();activeArcs.push(l);}
+  if(remaining.length>1){const l=L.polyline(remaining,{color:'#BFA2DC',weight:2,opacity:0.7,dashArray:'5,5'}).addTo(map);l.bringToBack();activeArcs.push(l);}
 }
-
 function drawNetworkArcs(ap,connectedIATAs,airports){
   clearArcs();
   connectedIATAs.forEach(iata=>{
@@ -446,16 +410,12 @@ function drawNetworkArcs(ap,connectedIATAs,airports){
   });
 }
 
-// ── TABS ─────────────────────────────────────
-
 function switchTab(tabId){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
   document.getElementById('tab-'+tabId).classList.add('active');
   document.getElementById('tabcontent-'+tabId).classList.add('active');
 }
-
-// ── INFO PANEL ────────────────────────────────
 
 function closeInfoPanel(){
   document.getElementById('info-panel').classList.remove('open');
@@ -468,10 +428,8 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
   const body=document.getElementById('info-panel-body');
   document.getElementById('info-panel-title').textContent=ac.reg;
   panel.classList.add('open');
-
   const tz=HUB_TZ[ac.homeBase]||345;
   const isMaint=ac.status&&ac.status.toLowerCase().includes('maintenance');
-
   if(isMaint){
     body.innerHTML=`
       <div class="panel-reg">${ac.reg}</div>
@@ -483,14 +441,11 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
       </div>`;
     return;
   }
-
   if(pos.status==='airborne'&&pos.leg) drawFlightArc(pos.leg,pos.legT);
-
   const now=new Date();
   const legs=getLegsInWindow(ac,routeMap,airports,now,12,24);
   const nowLocal=new Date(now.getTime()+tz*60000);
   const nowHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
-
   let statusHtml='';
   if(pos.status==='airborne'){
     const elapsed=nowHrs-pos.deptHrs;
@@ -512,7 +467,6 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
         <div class="panel-row"><span class="panel-label">On ground at</span><span class="panel-val">${loc}</span></div>
       </div>`;
   }
-
   const legsHtml=legs.map(leg=>{
     const isCurrent=pos.status==='airborne'&&leg.fromIATA===pos.fromIATA&&leg.toIATA===pos.toIATA;
     const isPast=leg.arrHrs<nowHrs;
@@ -521,7 +475,6 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
       <div class="leg-time">${fmtHrs(leg.deptHrs)} – ${fmtHrs(leg.arrHrs)} LT</div>
     </div>`;
   }).join('');
-
   body.innerHTML=`
     <div class="panel-reg">${ac.reg}</div>
     <div class="panel-type">${ac.type}</div>
@@ -540,29 +493,21 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
 function openAirportPanel(ap,aircraftData,routeMap,airports){
   collapseSidebar();
   clearArcs();
-
-  // Draw network arcs
-  const connected=getConnectedIATAs(ap.iata,routeMap);
+  const connected=getConnectedIATAs(ap.iata,routeMap,airports);
   drawNetworkArcs(ap,connected,airports);
-
   const panel=document.getElementById('info-panel');
   const body=document.getElementById('info-panel-body');
   document.getElementById('info-panel-title').textContent=`${ap.iata} / ${ap.icao}`;
   panel.classList.add('open');
-
   const now=new Date();
   const {deps,arrs,ground}=getAirportLegsInWindow(ap.iata,aircraftData,routeMap,airports,now,12,24);
-
-  // Local time at airport
   const apTZ=Object.entries(HUB_TZ).find(([icao])=>icao===ap.icao);
   const tzOff=apTZ?apTZ[1]:null;
   const localTimeStr=tzOff!==null?formatTime(new Date(now.getTime()+tzOff*60000))+' LT':'—';
-
-  // Get nowHrs for each aircraft using its home base tz
   function legRow(item){
     const tz=HUB_TZ[item.ac.homeBase]||345;
-    const nowLocal=new Date(now.getTime()+tz*60000);
-    const nowHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
+    const nl=new Date(now.getTime()+tz*60000);
+    const nowHrs=nl.getUTCHours()+nl.getUTCMinutes()/60+nl.getUTCSeconds()/3600;
     const isPast=item.leg.arrHrs<nowHrs;
     const isCurrent=!isPast&&item.leg.deptHrs<=nowHrs;
     return `<div class="leg-item${isCurrent?' current':''}">
@@ -570,7 +515,6 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
       <div class="leg-time">${fmtHrs(item.leg.deptHrs)} – ${fmtHrs(item.leg.arrHrs)} LT</div>
     </div>`;
   }
-
   const depsHtml=deps.length?deps.map(legRow).join(''):'<div style="color:#443355;font-size:11px;">None in window</div>';
   const arrsHtml=arrs.length?arrs.map(legRow).join(''):'<div style="color:#443355;font-size:11px;">None in window</div>';
   const groundHtml=ground.length?ground.map(ac=>`
@@ -578,14 +522,13 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
       <div class="ac-ground-reg">${ac.reg}</div>
       <div class="ac-ground-type">${ac.type}</div>
     </div>`).join(''):'<div style="color:#443355;font-size:11px;">No aircraft on ground</div>';
-
   body.innerHTML=`
     <div class="panel-iata">${ap.iata}</div>
     <div class="panel-airport-name">${ap.name||''} · ${ap.icao}</div>
     <div class="panel-section">
       <div class="panel-section-title">Info</div>
       <div class="panel-row"><span class="panel-label">Local Time</span><span class="panel-val">${localTimeStr}</span></div>
-      ${ap.elev!==null?`<div class="panel-row"><span class="panel-label">Elevation</span><span class="panel-val">${ap.elev} ft</span></div>`:''}
+      ${ap.elev!==null&&ap.elev!==undefined?`<div class="panel-row"><span class="panel-label">Elevation</span><span class="panel-val">${ap.elev} ft</span></div>`:''}
       <div class="panel-row"><span class="panel-label">Connections</span><span class="panel-val">${connected.size}</span></div>
     </div>
     <div class="tab-bar">
@@ -597,8 +540,6 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
     <div class="tab-content" id="tabcontent-arrs">${arrsHtml}</div>
     <div class="tab-content" id="tabcontent-ground">${groundHtml}</div>`;
 }
-
-// ── FLEET CARD EXPAND ─────────────────────────
 
 let expandedReg=null;
 function expandCard(reg){
@@ -638,12 +579,9 @@ function expandCard(reg){
   }
 }
 
-// ── INIT ──────────────────────────────────────
-
 async function init(){
   try{
     console.log('Init started');
-
     document.getElementById('loading-msg').textContent='Loading fleet...';
     const fleetRaw=tableToObjects(await fetchSheet(SHEETS.fleet));
     const fleet=fleetRaw.filter(r=>r['Fleet Information Aircraft Type']&&r['Registration']);
@@ -674,8 +612,11 @@ async function init(){
       airportsByICAO[icao]=obj;
       const isHub=Object.keys(HUB_TZ).includes(icao);
       const marker=L.circleMarker([obj.lat,obj.lon],{
-        radius:isHub?7:5,fillColor:isHub?'#BFA2DC':'#5c158a',
-        color:isHub?'#c7c9d3':'#BFA2DC',weight:1.5,fillOpacity:isHub?1:0.85,
+        radius:      isHub ? 9 : 5,
+        fillColor:   isHub ? '#c7c9d3' : '#5c158a',
+        color:       isHub ? '#5c158a' : '#BFA2DC',
+        weight:      isHub ? 2 : 1.5,
+        fillOpacity: isHub ? 1 : 0.85,
       }).addTo(map);
       marker.bindTooltip(`<b>${iata}</b> / ${icao}`,{className:'leaflet-tooltip',permanent:false,direction:'top'});
       marker.on('click',()=>openAirportPanel(obj,window._aircraftData,routeMap,airportsByICAO));
@@ -695,7 +636,7 @@ async function init(){
       });
     });
 
-    // Build type groups for sidebar
+    // Group by type for sidebar
     const typeGroups={};
     aircraftData.forEach(ac=>{
       if(!typeGroups[ac.type]) typeGroups[ac.type]=[];
@@ -709,7 +650,7 @@ async function init(){
     const planeMarkers={};
     const posCache={};
 
-    // Compute positions first
+    // Compute positions
     aircraftData.forEach(ac=>{
       if(!ac.homeBase) return;
       const hubAp=airportsByICAO[ac.homeBase];
@@ -729,10 +670,10 @@ async function init(){
       }
     });
 
-    // Build grouped sidebar
+    // Build grouped sidebar — collapsed by default
     Object.entries(typeGroups).forEach(([type,acs])=>{
       const groupDiv=document.createElement('div');
-      groupDiv.className='type-group open';
+      groupDiv.className='type-group';
       groupDiv.innerHTML=`
         <div class="type-group-header" onclick="this.parentElement.classList.toggle('open')">
           <span>${type}</span>
@@ -743,7 +684,6 @@ async function init(){
         </div>
         <div class="type-group-body"></div>`;
       const groupBody=groupDiv.querySelector('.type-group-body');
-
       acs.forEach(ac=>{
         const div=document.createElement('div');
         div.className='fleet-item';
@@ -759,7 +699,6 @@ async function init(){
           <div class="fleet-item-body"></div>`;
         groupBody.appendChild(div);
       });
-
       listEl.appendChild(groupDiv);
     });
 
