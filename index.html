@@ -304,7 +304,6 @@ async function init() {
     const routesRaw=tableToObjects(await fetchSheet(SHEETS.routes))
       .filter(r=>r['Route Master List No.']&&r['Route']);
     console.log('Routes loaded:',routesRaw.length);
-
     const routeMap={};
     routesRaw.forEach(r=>{
       routeMap[r['Route Master List No.']]={
@@ -315,21 +314,23 @@ async function init() {
       };
     });
 
-    // Active IATA codes from schedule (only airports actually being flown)
-    const activeIATA = new Set();
-    scheduleRaw.forEach(row => {
-      ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+    // Schedule
+    document.getElementById('loading-msg').textContent='Loading schedule...';
+    const scheduleRaw=tableToObjects(await fetchSheet(SHEETS.schedule))
+      .filter(r=>r['Aircraft']&&r['Aircraft Schedule Aircraft Type']);
+    console.log('Schedule rows:',scheduleRaw.length);
+
+    // Active IATA codes from schedule cells
+    const activeIATA=new Set();
+    scheduleRaw.forEach(row=>{
+      ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day=>{
         if(row[day]) row[day].split(',').map(s=>s.trim()).forEach(d=>activeIATA.add(d));
       });
-      // Also add the hub itself
-      if(row['Homebase']) activeIATA.add(
-        // Convert ICAO homebase to IATA by looking it up
-        airportsRaw.find(a=>a['ICAO']===row['Homebase'])?.[  'Airport Information IATA'] || ''
-      );
+      if(row['Homebase']) activeIATA.add(row['Homebase']); // add hub ICAO too
     });
-    console.log('Active IATA codes:',activeIATA.size);
+    console.log('Active IATA/ICAO codes:',activeIATA.size);
 
-    // Airports
+    // Airports (after schedule so activeIATA is ready)
     document.getElementById('loading-msg').textContent='Loading airports...';
     const airportsRaw=tableToObjects(await fetchSheet(SHEETS.airports))
       .filter(r=>r['Airport Information IATA']&&r['Lat.']&&r['Lon.']);
@@ -338,18 +339,14 @@ async function init() {
     const airportsByICAO={};
     airportsRaw.forEach(ap=>{
       const iata=ap['Airport Information IATA'];
-      if(!activeIATA.has(iata)) return;
-      const obj={lat:ap['Lat.'],lon:ap['Lon.'],iata,icao:ap['ICAO'],name:ap['Airport Name']};
-      airportsByICAO[ap['ICAO']]=obj;
+      const icao=ap['ICAO'];
+      if(!activeIATA.has(iata) && !activeIATA.has(icao)) return;
+      const obj={lat:ap['Lat.'],lon:ap['Lon.'],iata,icao,name:ap['Airport Name']};
+      airportsByICAO[icao]=obj;
       makeAirportMarker(obj);
     });
 
-    // Schedule
-    document.getElementById('loading-msg').textContent='Loading schedule...';
-    const scheduleRaw=tableToObjects(await fetchSheet(SHEETS.schedule))
-      .filter(r=>r['Aircraft']&&r['Aircraft Schedule Aircraft Type']);
-    console.log('Schedule rows:',scheduleRaw.length);
-
+    // Build aircraft data
     const aircraftData=[];
     scheduleRaw.forEach(row=>{
       const reg=row['Aircraft'];
