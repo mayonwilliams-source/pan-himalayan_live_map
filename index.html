@@ -14,8 +14,6 @@
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'Alegreya Sans',sans-serif; background:var(--bg); color:var(--mist); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-
-    /* ── Topbar ── */
     #topbar { display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:52px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0; z-index:1000; }
     .brand { display:flex; align-items:baseline; gap:12px; }
     .brand-name { font-family:'Marcellus SC',serif; font-size:18px; font-weight:600; letter-spacing:1.5px; color:var(--mist); }
@@ -25,12 +23,8 @@
     .tz .label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--lilac); }
     .tz .time { font-size:15px; font-weight:600; color:var(--zanskar); font-variant-numeric:tabular-nums; letter-spacing:1px; }
     #fleet-count { font-size:12px; color:#444; letter-spacing:1px; }
-
-    /* ── Main layout ── */
     #main { display:flex; flex:1; overflow:hidden; position:relative; }
     #map { flex:1; background:var(--bg); }
-
-    /* ── Left sidebar ── */
     #sidebar { width:var(--sidebar-w); background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; transition:width 0.3s,opacity 0.3s; position:relative; z-index:500; }
     #sidebar.collapsed { width:0; opacity:0; pointer-events:none; }
     #sidebar-toggle { position:absolute; left:var(--sidebar-w); top:50%; transform:translateY(-50%); z-index:600; width:18px; height:48px; background:var(--bg2); border:1px solid var(--border); border-left:none; border-radius:0 6px 6px 0; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--lilac); font-size:10px; transition:left 0.3s; }
@@ -58,13 +52,7 @@
     .info-label { color:#665577; font-size:11px; }
     .info-val { color:var(--mist); font-size:12px; }
     .maintenance-msg { color:var(--red); font-size:12px; margin-top:4px; }
-
-    /* ── Right info panel ── */
-    #info-panel {
-      width:0; background:var(--bg2); border-left:1px solid var(--border);
-      display:flex; flex-direction:column; overflow:hidden; flex-shrink:0;
-      transition:width 0.3s; z-index:500;
-    }
+    #info-panel { width:0; background:var(--bg2); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; transition:width 0.3s; z-index:500; }
     #info-panel.open { width:var(--panel-w); }
     #info-panel-inner { width:var(--panel-w); display:flex; flex-direction:column; height:100%; overflow:hidden; }
     #info-panel-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px; border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -88,9 +76,7 @@
     .leg-time { color:#665577; }
     .leg-item.current { background:rgba(92,21,138,0.15); padding:6px 8px; border-radius:4px; margin:-2px -8px; }
     .leg-item.current .leg-route { color:var(--lilac); }
-
-    /* Leaflet */
-    .leaflet-container { background:var(--bg);
+    .leaflet-container { background:var(--bg); }
     .leaflet-control-zoom a { background:var(--bg2) !important; color:var(--mist) !important; border-color:var(--border) !important; }
     .leaflet-control-zoom a:hover { background:var(--bg3) !important; }
     .leaflet-control-attribution { background:rgba(10,2,8,0.85) !important; color:#333 !important; font-size:9px !important; }
@@ -102,8 +88,6 @@
     .popup-name { font-size:12px; color:var(--mist); margin-top:1px; }
     .popup-icao { font-size:10px; color:#887799; letter-spacing:1px; margin-top:2px; }
     .leaflet-tooltip { background:var(--bg2) !important; border:1px solid var(--border) !important; color:var(--mist) !important; font-family:'Alegreya Sans',sans-serif !important; font-size:11px !important; }
-
-    /* Loading */
     #loading { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; gap:20px; }
     #loading .logo { font-family:'Marcellus SC',serif; font-size:26px; font-weight:600; color:var(--mist); letter-spacing:2px; }
     #loading .tagline { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--lilac); }
@@ -155,16 +139,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <script>
-// ── POSITION ENGINE ───────────────────────────
-
-function haversineNmi(lat1,lon1,lat2,lon2) {
+function haversineNmi(lat1,lon1,lat2,lon2){
   const R=3440.065,phi1=lat1*Math.PI/180,phi2=lat2*Math.PI/180;
   const dphi=(lat2-lat1)*Math.PI/180,dlam=(lon2-lon1)*Math.PI/180;
   const a=Math.sin(dphi/2)**2+Math.cos(phi1)*Math.cos(phi2)*Math.sin(dlam/2)**2;
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
-
-function greatCircleInterp(lat1,lon1,lat2,lon2,t) {
+function greatCircleInterp(lat1,lon1,lat2,lon2,t){
   const toRad=d=>d*Math.PI/180,toDeg=r=>r*180/Math.PI;
   const φ1=toRad(lat1),λ1=toRad(lon1),φ2=toRad(lat2),λ2=toRad(lon2);
   const d=2*Math.asin(Math.sqrt(Math.sin((φ2-φ1)/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2));
@@ -175,36 +156,28 @@ function greatCircleInterp(lat1,lon1,lat2,lon2,t) {
   const z=A*Math.sin(φ1)+B*Math.sin(φ2);
   return {lat:toDeg(Math.atan2(z,Math.sqrt(x*x+y*y))),lon:toDeg(Math.atan2(y,x))};
 }
-
-function gcPoints(lat1,lon1,lat2,lon2,n=80) {
+function gcPoints(lat1,lon1,lat2,lon2,n=80){
   const pts=[];
-  for(let i=0;i<=n;i++) {
-    const p=greatCircleInterp(lat1,lon1,lat2,lon2,i/n);
-    pts.push([p.lat,p.lon]);
-  }
+  for(let i=0;i<=n;i++){const p=greatCircleInterp(lat1,lon1,lat2,lon2,i/n);pts.push([p.lat,p.lon]);}
   return pts;
 }
-
-function bearing(lat1,lon1,lat2,lon2) {
+function bearing(lat1,lon1,lat2,lon2){
   const toRad=d=>d*Math.PI/180;
   const φ1=toRad(lat1),φ2=toRad(lat2),Δλ=toRad(lon2-lon1);
   const y=Math.sin(Δλ)*Math.cos(φ2),x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
   return (Math.atan2(y,x)*180/Math.PI+360)%360;
 }
-
-function parseDuration(str) {
+function parseDuration(str){
   if(!str) return 0;
   const parts=String(str).split(':').map(Number);
   return parts[0]+(parts[1]||0)/60+(parts[2]||0)/3600;
 }
-
-function parseTime(str) {
+function parseTime(str){
   if(!str) return 6;
   const parts=String(str).split(':').map(Number);
   return parts[0]+(parts[1]||0)/60;
 }
-
-function buildLegs(ac,route,airports) {
+function buildLegs(ac,route,airports){
   const hubAp=airports[ac.homeBase];
   if(!hubAp||!route) return [];
   const dests=route.dests.split(',').map(s=>s.trim()).filter(Boolean);
@@ -213,7 +186,7 @@ function buildLegs(ac,route,airports) {
   const turnaround=parseDuration(ac.turnaround);
   const legs=[];
   let cursor=startHrs;
-  for(let i=0;i<dests.length;i++) {
+  for(let i=0;i<dests.length;i++){
     const destAp=Object.values(airports).find(a=>a.iata===dests[i]);
     if(!destAp) continue;
     const dist=haversineNmi(hubAp.lat,hubAp.lon,destAp.lat,destAp.lon);
@@ -226,8 +199,7 @@ function buildLegs(ac,route,airports) {
   }
   return legs;
 }
-
-function computePosition(ac,route,airports,nowUTC) {
+function computePosition(ac,route,airports,nowUTC){
   const hubICAO=ac.homeBase;
   const tzOffset=HUB_TZ[hubICAO]||345;
   const nowLocal=new Date(nowUTC.getTime()+tzOffset*60000);
@@ -242,32 +214,29 @@ function computePosition(ac,route,airports,nowUTC) {
   if(!legs.length) return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO};
   const startHrs=route.startTime!==null?route.startTime:6.0;
   if(localHrs<startHrs) return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO,hubIATA:hubAp.iata};
-  for(let i=0;i<legs.length;i++) {
+  for(let i=0;i<legs.length;i++){
     const leg=legs[i];
-    if(localHrs>=leg.deptHrs&&localHrs<leg.arrHrs) {
+    if(localHrs>=leg.deptHrs&&localHrs<leg.arrHrs){
       const t=(localHrs-leg.deptHrs)/(leg.arrHrs-leg.deptHrs);
       const pos=greatCircleInterp(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon,t);
       return {status:'airborne',lat:pos.lat,lon:pos.lon,heading:bearing(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon),fromIATA:leg.fromIATA,toIATA:leg.toIATA,deptHrs:leg.deptHrs,arrHrs:leg.arrHrs,legT:t,leg,hubICAO};
     }
-    if(i<legs.length-1&&localHrs>=leg.arrHrs&&localHrs<legs[i+1].deptHrs) {
+    if(i<legs.length-1&&localHrs>=leg.arrHrs&&localHrs<legs[i+1].deptHrs){
       return {status:'ground',lat:leg.toLat,lon:leg.toLon,atIATA:leg.toIATA,hubICAO};
     }
   }
   return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO,hubIATA:hubAp.iata};
 }
-
-// Build all legs for ±12/24hr window
-function getLegsInWindow(ac,routeMap,airports,nowUTC,pastHrs,futureHrs) {
+function getLegsInWindow(ac,routeMap,airports,nowUTC,pastHrs,futureHrs){
   const hubICAO=ac.homeBase;
   const tzOffset=HUB_TZ[hubICAO]||345;
   const nowLocal=new Date(nowUTC.getTime()+tzOffset*60000);
   const localHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
   const jsDow=nowLocal.getUTCDay();
-
   const results=[];
-  // Check today and tomorrow (to cover 24hr window across midnight)
-  for(let dayOffset=-1;dayOffset<=2;dayOffset++) {
-    const sd=((jsDow+dayOffset+7)%7===0)?6:((jsDow+dayOffset+7)%7)-1;
+  for(let dayOffset=-1;dayOffset<=2;dayOffset++){
+    const rawDow=(jsDow+dayOffset+7)%7;
+    const sd=rawDow===0?6:rawDow-1;
     const routeNum=ac.routeNums[sd];
     const route=routeNum?routeMap[routeNum]:null;
     if(!route) continue;
@@ -275,7 +244,7 @@ function getLegsInWindow(ac,routeMap,airports,nowUTC,pastHrs,futureHrs) {
     legs.forEach(leg=>{
       const legDept=leg.deptHrs+dayOffset*24;
       const legArr=leg.arrHrs+dayOffset*24;
-      if(legArr>localHrs-pastHrs&&legDept<localHrs+futureHrs) {
+      if(legArr>localHrs-pastHrs&&legDept<localHrs+futureHrs){
         results.push({...leg,deptHrs:legDept,arrHrs:legArr,dayOffset});
       }
     });
@@ -285,8 +254,6 @@ function getLegsInWindow(ac,routeMap,airports,nowUTC,pastHrs,futureHrs) {
 </script>
 
 <script>
-// ── CONFIG ────────────────────────────────────
-
 const SHEET_ID='1Gn2t_5jhLf_gPHJN5ojSX270ImGtH2EYZi4HbwDgZJk';
 const SHEETS={fleet:'Fleet Information',airports:'Airport Information',routes:'Routes Master List',schedule:'Aircraft Schedule'};
 const HUB_TZ={VNKT:345,VQPR:360,VEGT:330,ZULS:480,VNPR:345,VNBW:345,VILH:330,OPSD:300};
@@ -294,14 +261,13 @@ const HUB_TZ={VNKT:345,VQPR:360,VEGT:330,ZULS:480,VNPR:345,VNBW:345,VILH:330,OPS
 function sheetUrl(name){return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;}
 function pad(n){return String(n).padStart(2,'0');}
 function formatTime(d){return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;}
-function fmtHrs(h,tz){
+function fmtHrs(h){
   if(h===undefined||h===null) return '—';
   const total=((h%24)+24)%24;
-  return `${Math.floor(total)}:${pad(Math.round((total%1)*60))}${tz?' '+tz:''}`;
+  return `${Math.floor(total)}:${pad(Math.round((total%1)*60))}`;
 }
 function hrsToUTC(localH,tzOffsetMin){
-  const utc=localH-tzOffsetMin/60;
-  return ((utc%24)+24)%24;
+  return ((localH-tzOffsetMin/60)%24+24)%24;
 }
 
 function updateClocks(){
@@ -313,8 +279,6 @@ function updateClocks(){
 setInterval(updateClocks,1000);
 updateClocks();
 
-// ── SIDEBAR ───────────────────────────────────
-
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
   const btn=document.getElementById('sidebar-toggle');
@@ -323,13 +287,8 @@ function toggleSidebar(){
   btn.innerHTML=collapsed?'&#9654;':'&#9664;';
 }
 
-// ── MAP ───────────────────────────────────────
-
 const map=L.map('map',{center:[27.5,87],zoom:5});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution:'© OpenStreetMap © CARTO',
-  maxZoom:19
-}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
 
 async function fetchSheet(name){
   const resp=await fetch(sheetUrl(name));
@@ -337,7 +296,6 @@ async function fetchSheet(name){
   const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
   return json.table;
 }
-
 function tableToObjects(table){
   const headers=table.cols.map(c=>c.label);
   return table.rows.filter(r=>r&&r.c&&r.c.some(c=>c&&c.v!==null)).map(r=>{
@@ -346,7 +304,6 @@ function tableToObjects(table){
     return obj;
   });
 }
-
 function statusClass(s){
   if(!s) return 'status-delivered';
   const l=s.toLowerCase();
@@ -363,14 +320,12 @@ function statusLabel(s){
   if(l.includes('waiting'))               return 'Waiting';
   return s;
 }
-
 function planeIcon(heading){
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform:rotate(${heading||0}deg);display:block;">
-    <path fill="#4B5D43" d="M21,16L13,12V5.5A1.5,1.5,0,0,0,10,5.5V12L2,16V18L10,15.5V20L8,21.5V23L12,22L16,23V21.5L14,20V15.5L22,18Z"/>
+    <path fill="#269473" d="M21,16L13,12V5.5A1.5,1.5,0,0,0,10,5.5V12L2,16V18L10,15.5V20L8,21.5V23L12,22L16,23V21.5L14,20V15.5L22,18Z"/>
   </svg>`;
   return L.divIcon({html:svg,className:'',iconSize:[24,24],iconAnchor:[12,12]});
 }
-
 function makeAirportMarker(ap){
   const isHub=Object.keys(HUB_TZ).includes(ap.icao);
   const marker=L.circleMarker([ap.lat,ap.lon],{
@@ -381,11 +336,8 @@ function makeAirportMarker(ap){
   return marker;
 }
 
-// ── ARC LAYERS ────────────────────────────────
-
 let activeArcs=[];
 function clearArcs(){activeArcs.forEach(l=>map.removeLayer(l));activeArcs=[];}
-
 function drawFlightArc(leg,progress){
   clearArcs();
   const allPts=gcPoints(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon,80);
@@ -393,16 +345,16 @@ function drawFlightArc(leg,progress){
   const elapsed=allPts.slice(0,splitIdx+1);
   const remaining=allPts.slice(splitIdx);
   if(elapsed.length>1){
-    const l=L.polyline(elapsed,{color:'#5c158a',weight:2.5,opacity:0.9}).addTo(map); l.bringToBack();
+    const l=L.polyline(elapsed,{color:'#5c158a',weight:2.5,opacity:0.9}).addTo(map);
+    l.bringToBack();
     activeArcs.push(l);
   }
   if(remaining.length>1){
     const l=L.polyline(remaining,{color:'#BFA2DC',weight:2,opacity:0.7,dashArray:'5,5'}).addTo(map);
+    l.bringToBack();
     activeArcs.push(l);
   }
 }
-
-// ── INFO PANEL ────────────────────────────────
 
 function closeInfoPanel(){
   document.getElementById('info-panel').classList.remove('open');
@@ -414,10 +366,8 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
   const body=document.getElementById('info-panel-body');
   document.getElementById('info-panel-title').textContent=ac.reg;
   panel.classList.add('open');
-
   const tz=HUB_TZ[ac.homeBase]||345;
   const isMaint=ac.status&&ac.status.toLowerCase().includes('maintenance');
-
   if(isMaint){
     body.innerHTML=`
       <div class="panel-reg">${ac.reg}</div>
@@ -429,34 +379,21 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
       </div>`;
     return;
   }
-
-  // Draw arc if airborne
-  if(pos.status==='airborne'&&pos.leg){
-    drawFlightArc(pos.leg,pos.legT);
-  }
-
-  // Build legs window
+  if(pos.status==='airborne'&&pos.leg) drawFlightArc(pos.leg,pos.legT);
   const now=new Date();
   const legs=getLegsInWindow(ac,routeMap,airports,now,12,24);
-  const localHrs=()=>{
-    const n=new Date();
-    const loc=new Date(n.getTime()+tz*60000);
-    return loc.getUTCHours()+loc.getUTCMinutes()/60+loc.getUTCSeconds()/3600;
-  };
-  const nowHrs=localHrs();
-
+  const nowLocal=new Date(now.getTime()+tz*60000);
+  const nowHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
   let statusHtml='';
   if(pos.status==='airborne'){
     const elapsed=nowHrs-pos.deptHrs;
     const remaining=pos.arrHrs-nowHrs;
-    const deptUTC=fmtHrs(hrsToUTC(pos.deptHrs,tz))+'z';
-    const arrUTC=fmtHrs(hrsToUTC(pos.arrHrs,tz))+'z';
     statusHtml=`
       <div class="panel-section">
         <div class="panel-section-title">Current Leg</div>
         <div class="panel-row"><span class="panel-label">Route</span><span class="panel-val">${pos.fromIATA} → ${pos.toIATA}</span></div>
-        <div class="panel-row"><span class="panel-label">Departed</span><span class="panel-val">${fmtHrs(pos.deptHrs)} LT<br><span style="font-size:10px;color:#665577;">${deptUTC}</span></span></div>
-        <div class="panel-row"><span class="panel-label">Arrives</span><span class="panel-val">${fmtHrs(pos.arrHrs)} LT<br><span style="font-size:10px;color:#665577;">${arrUTC}</span></span></div>
+        <div class="panel-row"><span class="panel-label">Departed</span><span class="panel-val">${fmtHrs(pos.deptHrs)} LT<br><span style="font-size:10px;color:#665577;">${fmtHrs(hrsToUTC(pos.deptHrs,tz))}z</span></span></div>
+        <div class="panel-row"><span class="panel-label">Arrives</span><span class="panel-val">${fmtHrs(pos.arrHrs)} LT<br><span style="font-size:10px;color:#665577;">${fmtHrs(hrsToUTC(pos.arrHrs,tz))}z</span></span></div>
         <div class="panel-row"><span class="panel-label">Elapsed</span><span class="panel-val">${Math.floor(elapsed)}h ${pad(Math.round((elapsed%1)*60))}m</span></div>
         <div class="panel-row"><span class="panel-label">Remaining</span><span class="panel-val">${Math.floor(remaining)}h ${pad(Math.round((remaining%1)*60))}m</span></div>
       </div>`;
@@ -468,7 +405,6 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
         <div class="panel-row"><span class="panel-label">On ground at</span><span class="panel-val">${loc}</span></div>
       </div>`;
   }
-
   const legsHtml=legs.map(leg=>{
     const isCurrent=pos.status==='airborne'&&leg.fromIATA===pos.fromIATA&&leg.toIATA===pos.toIATA;
     const isPast=leg.arrHrs<nowHrs;
@@ -477,7 +413,6 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
       <div class="leg-time">${fmtHrs(leg.deptHrs)} – ${fmtHrs(leg.arrHrs)} LT</div>
     </div>`;
   }).join('');
-
   body.innerHTML=`
     <div class="panel-reg">${ac.reg}</div>
     <div class="panel-type">${ac.type}</div>
@@ -493,10 +428,7 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
     </div>`;
 }
 
-// ── FLEET CARD EXPAND ─────────────────────────
-
 let expandedReg=null;
-
 function expandCard(reg){
   if(expandedReg&&expandedReg!==reg){
     const prev=document.getElementById('card-'+expandedReg);
@@ -507,14 +439,11 @@ function expandCard(reg){
   const isExpanding=!card.classList.contains('expanded');
   card.classList.toggle('expanded');
   expandedReg=isExpanding?reg:null;
-
   const body=card.querySelector('.fleet-item-body');
   if(!body||!isExpanding) return;
-
   const ac=window.aircraftDataMap[reg];
   const pos=window.posCache[reg];
   if(!ac) return;
-
   const isMaint=ac.status&&ac.status.toLowerCase().includes('maintenance');
   if(isMaint){
     body.innerHTML=`<div class="maintenance-msg">✖ Offline for Maintenance</div>
@@ -537,12 +466,9 @@ function expandCard(reg){
   }
 }
 
-// ── INIT ──────────────────────────────────────
-
 async function init(){
   try{
     console.log('Init started');
-
     document.getElementById('loading-msg').textContent='Loading fleet...';
     const fleetRaw=tableToObjects(await fetchSheet(SHEETS.fleet));
     const fleet=fleetRaw.filter(r=>r['Fleet Information Aircraft Type']&&r['Registration']);
@@ -657,7 +583,6 @@ async function init(){
 
     document.getElementById('loading').style.display='none';
     console.log('Done');
-
   }catch(err){
     console.error('INIT ERROR:',err);
     document.getElementById('loading-msg').textContent='Error: '+err.message;
