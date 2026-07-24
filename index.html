@@ -164,6 +164,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <script>
+console.log('HUB_TZ defined:', typeof HUB_TZ);
+console.log('Current NPT hour:', new Date(new Date().getTime()+345*60000).getUTCHours());
 // ── POSITION ENGINE ───────────────────────────
 
 function haversineNmi(lat1,lon1,lat2,lon2){
