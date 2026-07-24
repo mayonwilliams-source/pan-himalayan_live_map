@@ -302,14 +302,23 @@ function getConnectedIATAs(iata,routeMap,airports){
   const connected=new Set();
   const ap=Object.values(airports).find(a=>a.iata===iata);
   const isHub=ap&&Object.keys(HUB_TZ).includes(ap.icao);
+
   Object.values(routeMap).forEach(route=>{
     const dests=route.dests.split(',').map(s=>s.trim());
-    if(isHub&&route.hub===iata){
-      dests.forEach(d=>connected.add(d));
-    } else if(!isHub&&dests.includes(iata)){
-      connected.add(route.hub);
+    if(isHub){
+      if(route.hub===iata){
+        dests.forEach(d=>connected.add(d));
+      }
+      if(dests.includes(iata)){
+        connected.add(route.hub);
+      }
+    } else {
+      if(dests.includes(iata)){
+        connected.add(route.hub);
+      }
     }
   });
+
   connected.delete(iata);
   return connected;
 }
