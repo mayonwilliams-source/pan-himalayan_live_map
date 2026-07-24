@@ -22,7 +22,7 @@
       --rose:      #8a345f;
       --bg:        #000000;
       --bg2:       #000000;
-      --bg3:       #0a0208;       
+      --bg3:       #0a0208;
       --border:    #5c158a;
     }
 
@@ -38,7 +38,6 @@
       overflow: hidden;
     }
 
-    /* ── Top bar ── */
     #topbar {
       display: flex;
       align-items: center;
@@ -51,11 +50,7 @@
       z-index: 1000;
     }
 
-    .brand {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-    }
+    .brand { display: flex; align-items: baseline; gap: 12px; }
 
     .brand-name {
       font-family: 'Marcellus SC', serif;
@@ -63,9 +58,6 @@
       font-weight: 600;
       letter-spacing: 1.5px;
       color: var(--mist);
-    }
-    .brand-name em {
-    color: var(--mist);
     }
 
     .brand-sub {
@@ -76,17 +68,9 @@
       font-family: 'Marcellus SC', serif;
     }
 
-    #clock-block {
-      display: flex;
-      gap: 28px;
-    }
+    #clock-block { display: flex; gap: 28px; }
 
-    .tz {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1px;
-    }
+    .tz { display: flex; flex-direction: column; align-items: center; gap: 1px; }
 
     .tz .label {
       font-size: 9px;
@@ -103,26 +87,12 @@
       letter-spacing: 1px;
     }
 
-    #fleet-count {
-      font-size: 12px;
-      color: #444;
-      letter-spacing: 1px;
-    }
+    #fleet-count { font-size: 12px; color: #444; letter-spacing: 1px; }
 
-    /* ── Main layout ── */
-    #main {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
+    #main { display: flex; flex: 1; overflow: hidden; }
 
-    /* ── Map ── */
-    #map {
-      flex: 1;
-      background: var(--bg);
-    }
+    #map { flex: 1; background: var(--bg); }
 
-    /* ── Sidebar ── */
     #sidebar {
       width: 290px;
       background: var(--bg2);
@@ -143,12 +113,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    #fleet-list {
-      overflow-y: auto;
-      flex: 1;
-      padding: 6px 0;
-    }
-
+    #fleet-list { overflow-y: auto; flex: 1; padding: 6px 0; }
     #fleet-list::-webkit-scrollbar { width: 4px; }
     #fleet-list::-webkit-scrollbar-track { background: var(--bg2); }
     #fleet-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -165,8 +130,6 @@
 
     .fleet-item:hover { background: var(--bg3); }
 
-    .fleet-item-left {}
-
     .fleet-reg {
       font-family: 'Marcellus SC', serif;
       font-size: 14px;
@@ -175,19 +138,8 @@
       letter-spacing: 1px;
     }
 
-    .fleet-type {
-      font-size: 11px;
-      color: #554466;
-      margin-top: 2px;
-      letter-spacing: 0.3px;
-    }
-
-    .fleet-base {
-      font-size: 11px;
-      color: var(--lilac);
-      margin-top: 2px;
-      opacity: 0.7;
-    }
+    .fleet-type { font-size: 11px; color: #554466; margin-top: 2px; letter-spacing: 0.3px; }
+    .fleet-base { font-size: 11px; color: var(--lilac); margin-top: 2px; opacity: 0.7; }
 
     .fleet-status {
       font-size: 9px;
@@ -205,30 +157,11 @@
     .status-waiting     { background: #2a1a00; color: var(--marigold);  border: 1px solid #4a3a00; }
     .status-delivered   { background: #1a0a2a; color: var(--lilac);     border: 1px solid #2a1a3a; }
 
-    /* ── Leaflet overrides ── */
     .leaflet-container { background: var(--bg); }
-
-    .leaflet-tile {
-      filter: brightness(0.45) saturate(0.3) hue-rotate(210deg);
-    }
-
-    .leaflet-control-zoom a {
-      background: var(--bg2) !important;
-      color: var(--mist) !important;
-      border-color: var(--border) !important;
-      font-family: 'Cormorant Garamond', serif !important;
-    }
-
-    .leaflet-control-zoom a:hover {
-      background: var(--bg3) !important;
-    }
-
-    .leaflet-control-attribution {
-      background: rgba(10,2,8,0.85) !important;
-      color: #333 !important;
-      font-size: 9px !important;
-    }
-
+    .leaflet-tile { filter: brightness(0.45) saturate(0.3) hue-rotate(210deg); }
+    .leaflet-control-zoom a { background: var(--bg2) !important; color: var(--mist) !important; border-color: var(--border) !important; }
+    .leaflet-control-zoom a:hover { background: var(--bg3) !important; }
+    .leaflet-control-attribution { background: rgba(10,2,8,0.85) !important; color: #333 !important; font-size: 9px !important; }
     .leaflet-control-attribution a { color: #444 !important; }
 
     .leaflet-popup-content-wrapper {
@@ -237,87 +170,26 @@
       border: 1px solid var(--border) !important;
       border-radius: 4px !important;
       box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
-      font-family: 'Cormorant Garamond', serif !important;
+      font-family: 'Alegreya Sans', sans-serif !important;
     }
 
-    .leaflet-popup-tip {
-      background: var(--bg2) !important;
-    }
+    .leaflet-popup-tip { background: var(--bg2) !important; }
+    .leaflet-popup-content { font-size: 13px; line-height: 1.6; margin: 10px 14px !important; }
 
-    .leaflet-popup-content {
-      font-size: 13px;
-      line-height: 1.6;
-      margin: 10px 14px !important;
-    }
+    .popup-iata { font-family: 'Marcellus SC', serif; font-size: 18px; font-weight: 600; color: var(--lilac); letter-spacing: 1px; }
+    .popup-name { font-size: 12px; color: var(--mist); margin-top: 1px; }
+    .popup-icao { font-size: 10px; color: #887799; letter-spacing: 1px; margin-top: 2px; }
 
-    .popup-iata {
-      font-family: 'Marcellus SC', serif;
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--lilac);
-      letter-spacing: 1px;
-    }
-
-    .popup-name {
-      font-size: 12px;
-      color: var(--mist);
-      margin-top: 1px;
-    }
-
-    .popup-icao {
-      font-size: 10px;
-      color: #554466;
-      letter-spacing: 1px;
-      margin-top: 2px;
-    }
-
-    /* Loading overlay */
     #loading {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      gap: 20px;
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; gap: 20px;
     }
 
-    #loading .logo {
-      font-family: 'Marcellus SC', serif;
-      font-size: 26px;
-      font-weight: 600;
-      color: var(--mist);
-      letter-spacing: 2px;
-    }
-
-    #loading .logo em {
-      color: var(--mist);
-      font-style: normal;
-    }
-
-    #loading .tagline {
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--lilac);
-    }
-
-    #loading .spinner {
-      width: 36px;
-      height: 36px;
-      border: 2px solid var(--border);
-      border-top-color: var(--zanskar);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-    }
-
-    #loading .msg {
-      font-size: 12px;
-      color: #443355;
-      letter-spacing: 1px;
-    }
+    #loading .logo { font-family: 'Marcellus SC', serif; font-size: 26px; font-weight: 600; color: var(--mist); letter-spacing: 2px; }
+    #loading .tagline { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--lilac); }
+    #loading .spinner { width: 36px; height: 36px; border: 2px solid var(--border); border-top-color: var(--zanskar); border-radius: 50%; animation: spin 0.9s linear infinite; }
+    #loading .msg { font-size: 12px; color: #443355; letter-spacing: 1px; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -337,18 +209,9 @@
     <div class="brand-sub">Live Fleet Map</div>
   </div>
   <div id="clock-block">
-    <div class="tz">
-      <div class="label">NPT</div>
-      <div class="time" id="clock-npt">--:--:--</div>
-    </div>
-    <div class="tz">
-      <div class="label">UTC</div>
-      <div class="time" id="clock-utc">--:--:--</div>
-    </div>
-    <div class="tz">
-      <div class="label">Local</div>
-      <div class="time" id="clock-local">--:--:--</div>
-    </div>
+    <div class="tz"><div class="label">NPT</div><div class="time" id="clock-npt">--:--:--</div></div>
+    <div class="tz"><div class="label">UTC</div><div class="time" id="clock-utc">--:--:--</div></div>
+    <div class="tz"><div class="label">Local</div><div class="time" id="clock-local">--:--:--</div></div>
   </div>
   <div id="fleet-count">— aircraft</div>
 </div>
@@ -366,202 +229,108 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <script>
-// ─────────────────────────────────────────────
-// POSITION ENGINE
-// ─────────────────────────────────────────────
+// ── POSITION ENGINE ───────────────────────────
 
-// Haversine distance in nautical miles
 function haversineNmi(lat1, lon1, lat2, lon2) {
-  const R    = 3440.065; // Earth radius in nmi
-  const phi1 = lat1 * Math.PI/180;
-  const phi2 = lat2 * Math.PI/180;
-  const dphi = (lat2-lat1) * Math.PI/180;
-  const dlam = (lon2-lon1) * Math.PI/180;
-  const a    = Math.sin(dphi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dlam/2)**2;
-  const c    = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
+  const R = 3440.065;
+  const phi1 = lat1*Math.PI/180, phi2 = lat2*Math.PI/180;
+  const dphi = (lat2-lat1)*Math.PI/180, dlam = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dphi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dlam/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// Interpolate position along great circle (t = 0 to 1)
 function greatCircleInterp(lat1, lon1, lat2, lon2, t) {
-  const toRad = d => d * Math.PI/180;
-  const toDeg = r => r * 180/Math.PI;
-  const φ1 = toRad(lat1), λ1 = toRad(lon1);
-  const φ2 = toRad(lat2), λ2 = toRad(lon2);
-  const d  = 2 * Math.asin(Math.sqrt(
-    Math.sin((φ2-φ1)/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2
-  ));
+  const toRad = d => d*Math.PI/180, toDeg = r => r*180/Math.PI;
+  const φ1=toRad(lat1), λ1=toRad(lon1), φ2=toRad(lat2), λ2=toRad(lon2);
+  const d = 2*Math.asin(Math.sqrt(Math.sin((φ2-φ1)/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2));
   if (d < 1e-10) return { lat: lat1, lon: lon1 };
-  const A  = Math.sin((1-t)*d) / Math.sin(d);
-  const B  = Math.sin(t*d)     / Math.sin(d);
-  const x  = A*Math.cos(φ1)*Math.cos(λ1) + B*Math.cos(φ2)*Math.cos(λ2);
-  const y  = A*Math.cos(φ1)*Math.sin(λ1) + B*Math.cos(φ2)*Math.sin(λ2);
-  const z  = A*Math.sin(φ1)              + B*Math.sin(φ2);
-  return {
-    lat: toDeg(Math.atan2(z, Math.sqrt(x*x + y*y))),
-    lon: toDeg(Math.atan2(y, x)),
-  };
+  const A = Math.sin((1-t)*d)/Math.sin(d), B = Math.sin(t*d)/Math.sin(d);
+  const x = A*Math.cos(φ1)*Math.cos(λ1) + B*Math.cos(φ2)*Math.cos(λ2);
+  const y = A*Math.cos(φ1)*Math.sin(λ1) + B*Math.cos(φ2)*Math.sin(λ2);
+  const z = A*Math.sin(φ1) + B*Math.sin(φ2);
+  return { lat: toDeg(Math.atan2(z, Math.sqrt(x*x+y*y))), lon: toDeg(Math.atan2(y, x)) };
 }
 
-// Bearing from point 1 to point 2 (degrees)
 function bearing(lat1, lon1, lat2, lon2) {
-  const toRad = d => d * Math.PI/180;
-  const φ1 = toRad(lat1), φ2 = toRad(lat2);
-  const Δλ = toRad(lon2 - lon1);
-  const y  = Math.sin(Δλ) * Math.cos(φ2);
-  const x  = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
-  return (Math.atan2(y, x) * 180/Math.PI + 360) % 360;
+  const toRad = d => d*Math.PI/180;
+  const φ1=toRad(lat1), φ2=toRad(lat2), Δλ=toRad(lon2-lon1);
+  const y=Math.sin(Δλ)*Math.cos(φ2), x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 
-// Parse "hh:mm" or "hh:mm:ss" duration string to hours (handles >24h)
 function parseDuration(str) {
   if (!str) return 0;
   const parts = String(str).split(':').map(Number);
   return parts[0] + (parts[1]||0)/60 + (parts[2]||0)/3600;
 }
 
-// Parse "hh:mm" time string to fractional hours since midnight
 function parseTime(str) {
-  if (!str) return 6; // default 06:00
+  if (!str) return 6;
   const parts = String(str).split(':').map(Number);
   return parts[0] + (parts[1]||0)/60;
 }
 
-// Map aircraft type string to column group key
-function getAircraftGroup(typeStr) {
-  if (!typeStr) return null;
-  const t = typeStr.toLowerCase();
-  if (t.includes('a320neo') || t.includes('a20n')) return 'A20N';
-  if (t.includes('a320'))                           return 'A320';
-  if (t.includes('a319neo') || t.includes('a19n')) return 'A19N';
-  if (t.includes('a319'))                           return 'A319';
-  if (t.includes('atr') || t.includes('at46'))     return 'AT46';
-  return null;
-}
-
-// Days of week mapping (JS getDay: 0=Sun,1=Mon,...,6=Sat)
-const DAY_COLS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-// Maps to schedule columns D-J (index 0=Mon...6=Sun in the sheet)
-const SHEET_DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-
-// Given current UTC time, compute position of one aircraft
-// Returns { lat, lon, bearing, status, fromIATA, toIATA, depTime, arrTime, legProgress }
 function computePosition(ac, route, airports, nowUTC) {
   const hubICAO  = ac.homeBase;
-  const tzOffset = HUB_TZ[hubICAO] || 345; // minutes from UTC
-  const nowLocal = new Date(nowUTC.getTime() + tzOffset * 60000);
-
-  // Current local time in fractional hours since midnight
+  const tzOffset = HUB_TZ[hubICAO] || 345;
+  const nowLocal = new Date(nowUTC.getTime() + tzOffset*60000);
   const localHrs = nowLocal.getUTCHours() + nowLocal.getUTCMinutes()/60 + nowLocal.getUTCSeconds()/3600;
+  const jsDow    = nowLocal.getUTCDay();
+  const sheetDow = jsDow === 0 ? 6 : jsDow - 1;
 
-  // Day of week in local time (SHEET_DAY_ORDER index 0=Mon)
-  const jsDow    = nowLocal.getUTCDay(); // 0=Sun
-  const sheetDow = jsDow === 0 ? 6 : jsDow - 1; // 0=Mon...6=Sun
+  const destStr = ac.schedule[sheetDow];
+  if (!destStr) return { status:'ground', lat:null, lon:null, hubICAO };
 
-  // Get today's destination sequence
-  const destStr  = ac.schedule[sheetDow];
-  if (!destStr) return { status: 'ground', lat: null, lon: null, hubICAO };
+  const dests = destStr.split(',').map(s => s.trim()).filter(Boolean);
+  if (!dests.length) return { status:'ground', lat:null, lon:null, hubICAO };
 
-  // Parse destinations
-  const dests    = destStr.split(',').map(s => s.trim()).filter(Boolean);
-  if (!dests.length) return { status: 'ground', lat: null, lon: null, hubICAO };
+  const startHrs   = route.startTime !== null ? route.startTime : 6.0;
+  const speedKts   = ac.speed || 447;
+  const turnaround = parseDuration(ac.turnaround);
 
-  // Start time in local fractional hours
-  const startHrs = route.startTime !== null ? route.startTime : 6.0;
+  const hubAp = airports[hubICAO];
+  if (!hubAp) return { status:'ground', lat:null, lon:null, hubICAO };
 
-  // Speed in kts, turnaround in hours
-  const speedKts    = ac.speed || 447;
-  const turnaround  = parseDuration(ac.turnaround); // hours
-
-  // Hub airport coords
-  const hubAp = airports[hubICAO] || Object.values(airports).find(a => a.iata === ac.homeBaseIATA);
-  if (!hubAp) return { status: 'ground', lat: null, lon: null, hubICAO };
-
-  // Build legs array: each leg is { fromICAO, toICAO, deptHrs, arrHrs }
-  const legs   = [];
-  let   cursor = startHrs;
+  const legs = [];
+  let cursor = startHrs;
 
   for (let i = 0; i < dests.length; i++) {
-    const destIATA = dests[i];
-    const destAp   = Object.values(airports).find(a => a.iata === destIATA);
+    const destAp = Object.values(airports).find(a => a.iata === dests[i]);
     if (!destAp) continue;
 
-    // Outbound: hub → dest
-    const distOut  = haversineNmi(hubAp.lat, hubAp.lon, destAp.lat, destAp.lon);
-    const ftOut    = distOut / speedKts + 0.5; // hours, 30min fudge
-    legs.push({
-      fromIATA: hubAp.iata, toIATA: destIATA,
-      fromLat: hubAp.lat, fromLon: hubAp.lon,
-      toLat: destAp.lat, toLon: destAp.lon,
-      deptHrs: cursor, arrHrs: cursor + ftOut,
-    });
-    cursor += ftOut + turnaround; // turnaround at destination
+    const dist = haversineNmi(hubAp.lat, hubAp.lon, destAp.lat, destAp.lon);
+    const ft   = dist / speedKts + 0.5;
 
-    // Inbound: dest → hub
-    const ftIn = ftOut; // same distance
-    legs.push({
-      fromIATA: destIATA, toIATA: hubAp.iata,
-      fromLat: destAp.lat, fromLon: destAp.lon,
-      toLat: hubAp.lat, toLon: hubAp.lon,
-      deptHrs: cursor, arrHrs: cursor + ftIn,
-    });
-    cursor += ftIn;
+    legs.push({ fromIATA:hubAp.iata, toIATA:dests[i], fromLat:hubAp.lat, fromLon:hubAp.lon, toLat:destAp.lat, toLon:destAp.lon, deptHrs:cursor, arrHrs:cursor+ft });
+    cursor += ft + turnaround;
 
-    // Turnaround at hub before next dest (except after last)
-    if (i < dests.length - 1) cursor += turnaround;
+    legs.push({ fromIATA:dests[i], toIATA:hubAp.iata, fromLat:destAp.lat, fromLon:destAp.lon, toLat:hubAp.lat, toLon:hubAp.lon, deptHrs:cursor, arrHrs:cursor+ft });
+    cursor += ft;
+
+    if (i < dests.length-1) cursor += turnaround;
   }
 
-  // Find which leg we're currently on
-  if (localHrs < startHrs) {
-    return { status: 'ground', lat: hubAp.lat, lon: hubAp.lon, hubICAO, hubIATA: hubAp.iata };
-  }
+  if (localHrs < startHrs) return { status:'ground', lat:hubAp.lat, lon:hubAp.lon, hubICAO, hubIATA:hubAp.iata };
 
-  for (const leg of legs) {
+  for (let i = 0; i < legs.length; i++) {
+    const leg = legs[i];
     if (localHrs >= leg.deptHrs && localHrs < leg.arrHrs) {
       const t   = (localHrs - leg.deptHrs) / (leg.arrHrs - leg.deptHrs);
       const pos = greatCircleInterp(leg.fromLat, leg.fromLon, leg.toLat, leg.toLon, t);
-      const hdg = bearing(leg.fromLat, leg.fromLon, leg.toLat, leg.toLon);
-      return {
-        status:      'airborne',
-        lat:         pos.lat,
-        lon:         pos.lon,
-        heading:     hdg,
-        fromIATA:    leg.fromIATA,
-        toIATA:      leg.toIATA,
-        deptHrs:     leg.deptHrs,
-        arrHrs:      leg.arrHrs,
-        legProgress: t,
-        hubICAO,
-      };
+      return { status:'airborne', lat:pos.lat, lon:pos.lon, heading:bearing(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon), fromIATA:leg.fromIATA, toIATA:leg.toIATA, deptHrs:leg.deptHrs, arrHrs:leg.arrHrs, hubICAO };
     }
-
-    // Between legs (on ground at intermediate point)
-    const legIdx = legs.indexOf(leg);
-    if (legIdx < legs.length - 1) {
-      const next = legs[legIdx + 1];
-      if (localHrs >= leg.arrHrs && localHrs < next.deptHrs) {
-        // On ground at leg arrival airport
-        return {
-          status:   'ground',
-          lat:      leg.toLat,
-          lon:      leg.toLon,
-          atIATA:   leg.toIATA,
-          hubICAO,
-        };
-      }
+    if (i < legs.length-1 && localHrs >= leg.arrHrs && localHrs < legs[i+1].deptHrs) {
+      return { status:'ground', lat:leg.toLat, lon:leg.toLon, atIATA:leg.toIATA, hubICAO };
     }
   }
 
-  // After all legs complete — back at hub
-  return { status: 'ground', lat: hubAp.lat, lon: hubAp.lon, hubICAO, hubIATA: hubAp.iata };
+  return { status:'ground', lat:hubAp.lat, lon:hubAp.lon, hubICAO, hubIATA:hubAp.iata };
 }
 </script>
 
-
 <script>
-// ─────────────────────────────────────────────
-// CONFIG
-// ─────────────────────────────────────────────
+// ── CONFIG ────────────────────────────────────
+
 const SHEET_ID = '1Gn2t_5jhLf_gPHJN5ojSX270ImGtH2EYZi4HbwDgZJk';
 const SHEETS = {
   fleet:    'Fleet Information',
@@ -570,59 +339,36 @@ const SHEETS = {
   schedule: 'Aircraft Schedule',
 };
 
-// Timezone offsets from UTC in minutes
 const HUB_TZ = {
-  VNKT: 345,  // NPT  UTC+5:45
-  VQPR: 360,  // BTT  UTC+6:00
-  VEGT: 330,  // IST  UTC+5:30
-  ZULS: 480,  // CST  UTC+8:00
-  VNPR: 345,  // NPT  UTC+5:45
-  VNBW: 345,  // NPT  UTC+5:45
-  VILH: 330,  // IST  UTC+5:30 (Leh)
-  OPSD: 300,  // PST  UTC+5:00 (Skardu)
+  VNKT: 345, VQPR: 360, VEGT: 330, ZULS: 480,
+  VNPR: 345, VNBW: 345, VILH: 330, OPSD: 300,
 };
 
 function sheetUrl(name) {
   return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;
 }
 
-// ─────────────────────────────────────────────
-// CLOCK
-// ─────────────────────────────────────────────
-function pad(n) { return String(n).padStart(2,'0'); }
+// ── CLOCK ─────────────────────────────────────
 
-function formatTime(date) {
-  return `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
-}
+function pad(n) { return String(n).padStart(2,'0'); }
+function formatTime(d) { return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`; }
 
 function updateClocks() {
-  const now   = new Date();
-  const npt   = new Date(now.getTime() + 345*60*1000);
-  const local = now.toLocaleTimeString('en-GB');
-  document.getElementById('clock-npt').textContent   = formatTime(npt);
+  const now = new Date();
+  document.getElementById('clock-npt').textContent   = formatTime(new Date(now.getTime()+345*60000));
   document.getElementById('clock-utc').textContent   = formatTime(now);
-  document.getElementById('clock-local').textContent = local;
+  document.getElementById('clock-local').textContent = now.toLocaleTimeString('en-GB');
 }
 setInterval(updateClocks, 1000);
 updateClocks();
 
-// ─────────────────────────────────────────────
-// MAP
-// ─────────────────────────────────────────────
-const map = L.map('map', {
-  center: [27.5, 87],
-  zoom: 5,
-  zoomControl: true,
-});
+// ── MAP ───────────────────────────────────────
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors',
-  maxZoom: 18,
-}).addTo(map);
+const map = L.map('map', { center:[27.5,87], zoom:5 });
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap contributors', maxZoom:18 }).addTo(map);
 
-// ─────────────────────────────────────────────
-// DATA FETCHING
-// ─────────────────────────────────────────────
+// ── DATA ──────────────────────────────────────
+
 async function fetchSheet(name) {
   const resp = await fetch(sheetUrl(name));
   const text = await resp.text();
@@ -636,65 +382,62 @@ function tableToObjects(table) {
     .filter(r => r && r.c && r.c.some(c => c && c.v !== null))
     .map(r => {
       const obj = {};
-      headers.forEach((h, i) => { obj[h] = r.c[i] ? r.c[i].v : null; });
+      headers.forEach((h,i) => { obj[h] = r.c[i] ? r.c[i].v : null; });
       return obj;
     });
 }
 
-// ─────────────────────────────────────────────
-// STATUS
-// ─────────────────────────────────────────────
+// ── STATUS ────────────────────────────────────
+
 function statusClass(s) {
   if (!s) return 'status-delivered';
   const l = s.toLowerCase();
-  if (l.includes('service') || l === 'online') return 'status-online';
-  if (l.includes('maintenance'))               return 'status-maintenance';
-  if (l.includes('waiting'))                   return 'status-waiting';
+  if (l.includes('service') || l==='online') return 'status-online';
+  if (l.includes('maintenance'))             return 'status-maintenance';
+  if (l.includes('waiting'))                 return 'status-waiting';
   return 'status-delivered';
 }
 
 function statusLabel(s) {
   if (!s) return 'Delivered';
   const l = s.toLowerCase();
-  if (l.includes('service') || l === 'online') return 'Online';
-  if (l.includes('maintenance'))               return 'Maintenance';
-  if (l.includes('waiting'))                   return 'Waiting';
+  if (l.includes('service') || l==='online') return 'Online';
+  if (l.includes('maintenance'))             return 'Maintenance';
+  if (l.includes('waiting'))                 return 'Waiting';
   return s;
 }
 
-// ─────────────────────────────────────────────
-// AIRPORT MARKERS
-// ─────────────────────────────────────────────
+// ── PLANE ICON ────────────────────────────────
+
+function planeIcon(isAirborne, heading) {
+  const html = `<div style="width:20px;height:20px;background:${isAirborne?'#F7B500':'#c7c9d3'};border:2px solid ${isAirborne?'#c7c9d3':'#5c158a'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transform:rotate(${heading||0}deg);">✈</div>`;
+  return L.divIcon({ html, className:'', iconSize:[20,20], iconAnchor:[10,10] });
+}
+
+// ── AIRPORT MARKERS ───────────────────────────
+
 function makeAirportMarker(ap) {
   const isHub = Object.keys(HUB_TZ).includes(ap['ICAO']);
   const marker = L.circleMarker([ap['Lat.'], ap['Lon']], {
-    radius:      isHub ? 7 : 5,
-    fillColor:   isHub ? '#BFA2DC' : '#5c158a',
-    color:       isHub ? '#c7c9d3' : '#BFA2DC',
-    weight:      1.5,
-    fillOpacity: isHub ? 1 : 0.85,
+    radius: isHub?7:5, fillColor: isHub?'#BFA2DC':'#5c158a',
+    color: isHub?'#c7c9d3':'#BFA2DC', weight:1.5, fillOpacity: isHub?1:0.85,
   }).addTo(map);
-
-  marker.bindPopup(`
-    <div class="popup-iata">${ap['IATA']}</div>
-    <div class="popup-name">${ap['Airport Name'] || ''}</div>
-    <div class="popup-icao">${ap['ICAO'] || ''}</div>
-  `);
-
+  marker.bindPopup(`<div class="popup-iata">${ap['IATA']}</div><div class="popup-name">${ap['Airport Name']||''}</div><div class="popup-icao">${ap['ICAO']||''}</div>`);
   return marker;
 }
 
-// ─────────────────────────────────────────────
-// MAIN INIT
-// ─────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────
+
 async function init() {
   try {
     console.log('Init started');
-    document.getElementById('loading-msg').textContent = 'Loading fleet...';
-    const fleet = tableToObjects(await fetchSheet(SHEETS.fleet))
-      .filter(r => r['Aircraft Type'] && r['Registration']);
 
-    // Sidebar
+    // Fleet
+    document.getElementById('loading-msg').textContent = 'Loading fleet...';
+    const fleetRaw = tableToObjects(await fetchSheet(SHEETS.fleet));
+    const fleet    = fleetRaw.filter(r => r['Fleet Information Aircraft Type'] && r['Registration']);
+    console.log('Fleet loaded:', fleet.length, 'aircraft');
+
     const listEl = document.getElementById('fleet-list');
     listEl.innerHTML = '';
     fleet.forEach(ac => {
@@ -703,34 +446,32 @@ async function init() {
       div.innerHTML = `
         <div class="fleet-item-left">
           <div class="fleet-reg">${ac['Registration']}</div>
-          <div class="fleet-type">${ac['Aircraft Type']}</div>
-          <div class="fleet-base">${ac['Home Base'] || '—'}</div>
+          <div class="fleet-type">${ac['Fleet Information Aircraft Type']}</div>
+          <div class="fleet-base">${ac['Home Base']||'—'}</div>
         </div>
         <div class="fleet-status ${statusClass(ac['Status'])}">${statusLabel(ac['Status'])}</div>
       `;
       listEl.appendChild(div);
     });
+    document.getElementById('fleet-count').textContent = `${fleet.length} aircraft`;
 
-    document.getElementById('fleet-count').textContent =
-      `${fleet.length} aircraft`;
-
+    // Airports
     document.getElementById('loading-msg').textContent = 'Loading airports...';
-    const airports = tableToObjects(await fetchSheet(SHEETS.airports))
-      .filter(r => r['IATA'] && r['Lat.'] && r['Lon']);
+    const airports = tableToObjects(await fetchSheet(SHEETS.airports)).filter(r => r['IATA'] && r['Lat.'] && r['Lon']);
+    console.log('Airports loaded:', airports.length);
 
     airports.forEach(ap => makeAirportMarker(ap));
 
-    // Build airport lookup by ICAO and IATA
     const airportsByICAO = {};
-    const airportsByIATA = {};
     airports.forEach(ap => {
-      airportsByICAO[ap['ICAO']] = { lat: ap['Lat.'], lon: ap['Lon'], iata: ap['IATA'], icao: ap['ICAO'], name: ap['Airport Name'] };
-      airportsByIATA[ap['IATA']] = { lat: ap['Lat.'], lon: ap['Lon'], iata: ap['IATA'], icao: ap['ICAO'], name: ap['Airport Name'] };
+      airportsByICAO[ap['ICAO']] = { lat:ap['Lat.'], lon:ap['Lon'], iata:ap['IATA'], icao:ap['ICAO'], name:ap['Airport Name'] };
     });
 
+    // Routes
     document.getElementById('loading-msg').textContent = 'Loading routes...';
-    const routesRaw = tableToObjects(await fetchSheet(SHEETS.routes))
-      .filter(r => r['No.'] && r['Route']);
+    const routesRaw = tableToObjects(await fetchSheet(SHEETS.routes)).filter(r => r['No.'] && r['Route']);
+    console.log('Routes loaded:', routesRaw.length);
+
     const routeMap = {};
     routesRaw.forEach(r => {
       routeMap[r['No.']] = {
@@ -741,70 +482,54 @@ async function init() {
       };
     });
 
-      document.getElementById('loading-msg').textContent = 'Loading schedule...';
-      const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
-          .filter(r => r['Aircraft'] && r['Aircraft Schedule Aircraft Type']);
+    // Schedule
+    document.getElementById('loading-msg').textContent = 'Loading schedule...';
+    const scheduleRaw = tableToObjects(await fetchSheet(SHEETS.schedule))
+      .filter(r => r['Aircraft'] && r['Aircraft Schedule Aircraft Type']);
+    console.log('Schedule rows:', scheduleRaw.length);
 
-      scheduleRaw.forEach(row => {
-          const reg = row['Aircraft'];
-          const fleetRow = fleet.find(f => f['Registration'] === reg);
-          if (!fleetRow) return;
+    const aircraftData = [];
+    scheduleRaw.forEach(row => {
+      const reg      = row['Aircraft'];
+      const fleetRow = fleet.find(f => f['Registration'] === reg);
+      if (!fleetRow) return;
 
-          const schedule = [row['Monday'], row['Tuesday'], row['Wednesday'], row['Thursday'], row['Friday'], row['Saturday'], row['Sunday']];
-          const routeNums = [row['M'], row['Tu'], row['W'], row['Th'], row['F'], row['Sa'], row['Su']];
-
-          aircraftData.push({
-              reg,
-              type: fleetRow['Fleet Information Aircraft Type'],
-              homeBase: fleetRow['Home Base'],
-              status: fleetRow['Status'],
-              speed: parseFloat(fleetRow['Average Cruise Speed [kts]']) || 447,
-              turnaround: fleetRow['Turnaround Time'] || '0:45:00',
-              schedule,
-              routeNums,
-          });
+      aircraftData.push({
+        reg,
+        type:       row['Aircraft Schedule Aircraft Type'],
+        homeBase:   row['Homebase'],
+        status:     fleetRow['Status'],
+        speed:      parseFloat(fleetRow['Average Cruise Speed [kts]']) || 447,
+        turnaround: fleetRow['Turnaround Time'] || '0:45:00',
+        schedule:   [row['Monday'],row['Tuesday'],row['Wednesday'],row['Thursday'],row['Friday'],row['Saturday'],row['Sunday']],
+        routeNums:  [row['M'],row['Tu'],row['W'],row['Th'],row['F'],row['Sa'],row['Su']],
       });
+    });
+    console.log('Aircraft data built:', aircraftData.length);
 
-      // Place aircraft markers
-   const planeMarkers = {};
+    // Place markers
+    const planeMarkers = {};
     aircraftData.forEach(ac => {
       if (!ac.homeBase) return;
       const hubAp = airportsByICAO[ac.homeBase];
       if (!hubAp) return;
 
-      // Get today's route
       const now      = new Date();
-      const jsDow    = new Date(now.getTime() + (HUB_TZ[ac.homeBase]||345)*60000).getUTCDay();
-      const sheetDow = jsDow === 0 ? 6 : jsDow - 1;
+      const jsDow    = new Date(now.getTime()+(HUB_TZ[ac.homeBase]||345)*60000).getUTCDay();
+      const sheetDow = jsDow===0 ? 6 : jsDow-1;
       const routeNum = ac.routeNums[sheetDow];
       const route    = routeNum ? routeMap[routeNum] : null;
 
       const pos = route
         ? computePosition(ac, route, airportsByICAO, now)
-        : { status: 'ground', lat: hubAp.lat, lon: hubAp.lon };
+        : { status:'ground', lat:hubAp.lat, lon:hubAp.lon };
 
-      if (pos.lat === null) {
-        pos.lat = hubAp.lat;
-        pos.lon = hubAp.lon;
-      }
+      if (pos.lat === null) { pos.lat = hubAp.lat; pos.lon = hubAp.lon; }
 
-      // Simple plane icon using SVG
       const isAirborne = pos.status === 'airborne';
-      const iconHtml = `<div style="
-        width:20px; height:20px;
-        background: ${isAirborne ? '#F7B500' : '#c7c9d3'};
-        border: 2px solid ${isAirborne ? '#c7c9d3' : '#5c158a'};
-        border-radius: 50%;
-        display:flex; align-items:center; justify-content:center;
-        font-size:10px; cursor:pointer;
-        transform: rotate(${pos.heading||0}deg);
-      ">✈</div>`;
+      const marker = L.marker([pos.lat, pos.lon], { icon: planeIcon(isAirborne, pos.heading) }).addTo(map);
 
-      const icon = L.divIcon({ html: iconHtml, className: '', iconSize: [20,20], iconAnchor: [10,10] });
-      const marker = L.marker([pos.lat, pos.lon], { icon }).addTo(map);
-
-      const deptStr = pos.deptHrs !== undefined ? `${Math.floor(pos.deptHrs)}:${String(Math.round((pos.deptHrs%1)*60)).padStart(2,'0')}` : '—';
-      const arrStr  = pos.arrHrs  !== undefined ? `${Math.floor(pos.arrHrs)}:${String(Math.round((pos.arrHrs%1)*60)).padStart(2,'0')}` : '—';
+      const fmtHrs = h => h !== undefined ? `${Math.floor(h)}:${pad(Math.round((h%1)*60))}` : '—';
 
       marker.bindPopup(`
         <div class="popup-iata">${ac.reg}</div>
@@ -812,17 +537,19 @@ async function init() {
         <div class="popup-icao">Base: ${ac.homeBase}</div>
         <div class="popup-icao" style="margin-top:6px;">
           ${isAirborne
-            ? `✈ ${pos.fromIATA} → ${pos.toIATA}<br>Dep: ${deptStr} &nbsp; Arr: ${arrStr} LT`
-            : `⬛ On ground${pos.atIATA ? ' at ' + pos.atIATA : ''}`
+            ? `✈ ${pos.fromIATA} → ${pos.toIATA}<br>Dep: ${fmtHrs(pos.deptHrs)} &nbsp; Arr: ${fmtHrs(pos.arrHrs)} LT`
+            : `On ground${pos.atIATA ? ' at '+pos.atIATA : ''}`
           }
         </div>
         ${routeNum ? `<div class="popup-icao" style="margin-top:4px;">Route: ${routeNum}</div>` : ''}
       `);
 
-      planeMarkers[ac.reg] = { marker, ac, route, pos };
+      planeMarkers[ac.reg] = { marker, ac, route };
     });
 
-    // Update positions every 30 seconds
+    console.log('Plane markers placed:', Object.keys(planeMarkers).length);
+
+    // Update every 30s
     setInterval(() => {
       const now = new Date();
       Object.values(planeMarkers).forEach(({ marker, ac, route }) => {
@@ -832,27 +559,17 @@ async function init() {
         const pos = computePosition(ac, route, airportsByICAO, now);
         if (pos.lat === null) return;
         marker.setLatLng([pos.lat, pos.lon]);
-        const isAirborne = pos.status === 'airborne';
-        const iconHtml = `<div style="
-          width:20px; height:20px;
-          background: ${isAirborne ? '#F7B500' : '#c7c9d3'};
-          border: 2px solid ${isAirborne ? '#c7c9d3' : '#5c158a'};
-          border-radius: 50%;
-          display:flex; align-items:center; justify-content:center;
-          font-size:10px; cursor:pointer;
-          transform: rotate(${pos.heading||0}deg);
-        ">✈</div>`;
-        marker.setIcon(L.divIcon({ html: iconHtml, className: '', iconSize: [20,20], iconAnchor: [10,10] }));
+        marker.setIcon(planeIcon(pos.status==='airborne', pos.heading));
       });
     }, 30000);
 
-        document.getElementById('loading').style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
 
-    } catch (err) {
-        console.error('INIT ERROR:', err);
-        console.error('Stack:', err.stack);
-        document.getElementById('loading-msg').textContent = 'Error: ' + err.message;
-    }
+  } catch(err) {
+    console.error('INIT ERROR:', err);
+    console.error('Stack:', err.stack);
+    document.getElementById('loading-msg').textContent = 'Error: ' + err.message;
+  }
 }
 
 init();
