@@ -710,6 +710,7 @@ async function init(){
       const route=routeNum?routeMap[routeNum]:null;
       const pos=route&&hubAp?computePosition(ac,route,airportsByICAO,now):{status:'ground',lat:hubAp?.lat||null,lon:hubAp?.lon||null};
       posCache[ac.reg]=pos;
+      console.log(ac.reg, 'routeNum:', routeNum, 'startTime:', route?.startTime, 'pos:', pos.status, 'localHrs:', new Date(new Date().getTime()+(HUB_TZ[ac.homeBase]||345)*60000).getUTCHours());
       if(pos.status==='airborne'){
         const marker=L.marker([pos.lat,pos.lon],{icon:planeIcon(pos.heading)}).addTo(map);
         marker.bindTooltip(ac.reg,{permanent:false,direction:'top',className:'leaflet-tooltip'});
