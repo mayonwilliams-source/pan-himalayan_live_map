@@ -641,6 +641,8 @@ async function init(){
 
     document.getElementById('loading-msg').textContent='Loading routes...';
     const routesRaw=tableToObjects(await fetchSheet(SHEETS.routes)).filter(r=>r['Route Master List No.']&&r['Route']);
+    console.log('Route columns:', Object.keys(routesRaw[0]));
+    console.log('First route startTime raw:', routesRaw[0]['Start Time (LT)']);
     const routeMap={};
     routesRaw.forEach(r=>{routeMap[r['Route Master List No.']]={id:r['Route Master List No.'],hub:r['Hub'],dests:r['Route'],startTime:r['Start Time (LT)']?parseTime(r['Start Time (LT)']):6.0};});
 
