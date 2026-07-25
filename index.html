@@ -205,11 +205,12 @@ function parseDuration(str){
   return parts[0]+(parts[1]||0)/60+(parts[2]||0)/3600;
 }
 function parseTime(str){
-  console.log('parseTime called with:', str, typeof str);
   if(!str) return 6;
   if(typeof str === 'number') return str * 24;
-  const parts=String(str).split(':').map(Number);
-  return parts[0]+(parts[1]||0)/60;
+  const dateMatch = String(str).match(/Date\(\d+,\d+,\d+,(\d+),(\d+)/);
+  if(dateMatch) return parseInt(dateMatch[1]) + parseInt(dateMatch[2])/60;
+  const parts = String(str).split(':').map(Number);
+  return parts[0] + (parts[1]||0)/60;
 }
 function buildLegs(ac,route,airports){
   const hubAp=airports[ac.homeBase];
