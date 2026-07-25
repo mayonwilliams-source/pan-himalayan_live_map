@@ -1,3 +1,5 @@
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,8 +87,6 @@
     .panel-type { font-size:13px; color:#887799; margin-bottom:12px; }
     .panel-iata { font-family:'Marcellus SC',serif; font-size:26px; color:var(--lilac); letter-spacing:3px; margin-bottom:2px; }
     .panel-airport-name { font-size:12px; color:#887799; margin-bottom:12px; }
-
-    /* Flight leg cards */
     .leg-card { padding:8px 10px; border-radius:4px; background:#0a0012; margin-bottom:6px; border:1px solid #1a0a2a; font-size:13px; }
     .leg-card.live { background:rgba(92,21,138,0.18); border-color:var(--zanskar); cursor:pointer; }
     .leg-card.live:hover { background:rgba(92,21,138,0.28); }
@@ -98,12 +98,10 @@
     .leg-card-status .status-time { color:var(--mist); font-weight:600; margin-left:4px; }
     .leg-card-status.live-status { color:var(--turquoise); }
     .leg-card-status.live-status .status-time { color:var(--turquoise); }
-
     .ac-ground-item { padding:6px 0; border-bottom:1px solid #1a0a2a; font-size:12px; }
     .ac-ground-item:last-child { border-bottom:none; }
     .ac-ground-reg { font-family:'Marcellus SC',serif; color:var(--mist); font-size:13px; }
     .ac-ground-type { color:#665577; font-size:11px; margin-top:1px; }
-
     .leaflet-container { background:var(--bg); }
     .leaflet-control-zoom a { background:var(--bg2) !important; color:var(--mist) !important; border-color:var(--border) !important; }
     .leaflet-control-zoom a:hover { background:var(--bg3) !important; }
@@ -122,14 +120,14 @@
   </style>
 </head>
 <body>
-
+ 
 <div id="loading">
   <div class="logo">Pan-Himalayan Airlines</div>
   <div class="tagline">Live Fleet Map</div>
   <div class="spinner"></div>
   <div class="msg" id="loading-msg">Initialising...</div>
 </div>
-
+ 
 <div id="topbar">
   <div class="brand">
     <div class="brand-name">Pan-Himalayan Airlines</div>
@@ -142,7 +140,7 @@
   </div>
   <div id="fleet-count">— aircraft</div>
 </div>
-
+ 
 <div id="main">
   <div id="sidebar">
     <div class="sidebar-header">Fleet</div>
@@ -160,17 +158,12 @@
     </div>
   </div>
 </div>
-
+ 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
+ 
 <script>
-  const HUB_TZ={VNKT:345,VQPR:360,VEGT:330,ZULS:480,VNPR:345,VNBW:345,VILH:330,OPSD:300};
-  
-console.log('HUB_TZ defined:', typeof HUB_TZ);
-console.log('Current NPT hour:', new Date(new Date().getTime()+345*60000).getUTCHours());
-// ── POSITION ENGINE ───────────────────────────
-
-  
+const HUB_TZ={VNKT:345,VQPR:360,VEGT:330,ZULS:480,VNPR:345,VNBW:345,VILH:330,OPSD:300};
+ 
 function haversineNmi(lat1,lon1,lat2,lon2){
   const R=3440.065,phi1=lat1*Math.PI/180,phi2=lat2*Math.PI/180;
   const dphi=(lat2-lat1)*Math.PI/180,dlam=(lon2-lon1)*Math.PI/180;
@@ -179,13 +172,13 @@ function haversineNmi(lat1,lon1,lat2,lon2){
 }
 function greatCircleInterp(lat1,lon1,lat2,lon2,t){
   const toRad=d=>d*Math.PI/180,toDeg=r=>r*180/Math.PI;
-  const φ1=toRad(lat1),λ1=toRad(lon1),φ2=toRad(lat2),λ2=toRad(lon2);
-  const d=2*Math.asin(Math.sqrt(Math.sin((φ2-φ1)/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2));
+  const f1=toRad(lat1),l1=toRad(lon1),f2=toRad(lat2),l2=toRad(lon2);
+  const d=2*Math.asin(Math.sqrt(Math.sin((f2-f1)/2)**2+Math.cos(f1)*Math.cos(f2)*Math.sin((l2-l1)/2)**2));
   if(d<1e-10) return {lat:lat1,lon:lon1};
   const A=Math.sin((1-t)*d)/Math.sin(d),B=Math.sin(t*d)/Math.sin(d);
-  const x=A*Math.cos(φ1)*Math.cos(λ1)+B*Math.cos(φ2)*Math.cos(λ2);
-  const y=A*Math.cos(φ1)*Math.sin(λ1)+B*Math.cos(φ2)*Math.sin(λ2);
-  const z=A*Math.sin(φ1)+B*Math.sin(φ2);
+  const x=A*Math.cos(f1)*Math.cos(l1)+B*Math.cos(f2)*Math.cos(l2);
+  const y=A*Math.cos(f1)*Math.sin(l1)+B*Math.cos(f2)*Math.sin(l2);
+  const z=A*Math.sin(f1)+B*Math.sin(f2);
   return {lat:toDeg(Math.atan2(z,Math.sqrt(x*x+y*y))),lon:toDeg(Math.atan2(y,x))};
 }
 function gcPoints(lat1,lon1,lat2,lon2,n=80){
@@ -195,8 +188,8 @@ function gcPoints(lat1,lon1,lat2,lon2,n=80){
 }
 function bearing(lat1,lon1,lat2,lon2){
   const toRad=d=>d*Math.PI/180;
-  const φ1=toRad(lat1),φ2=toRad(lat2),Δλ=toRad(lon2-lon1);
-  const y=Math.sin(Δλ)*Math.cos(φ2),x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
+  const f1=toRad(lat1),f2=toRad(lat2),dl=toRad(lon2-lon1);
+  const y=Math.sin(dl)*Math.cos(f2),x=Math.cos(f1)*Math.sin(f2)-Math.sin(f1)*Math.cos(f2)*Math.cos(dl);
   return (Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 function parseDuration(str){
@@ -206,11 +199,11 @@ function parseDuration(str){
 }
 function parseTime(str){
   if(!str) return 6;
-  if(typeof str === 'number') return str * 24;
-  const dateMatch = String(str).match(/Date\(\d+,\d+,\d+,(\d+),(\d+)/);
-  if(dateMatch) return parseInt(dateMatch[1]) + parseInt(dateMatch[2])/60;
-  const parts = String(str).split(':').map(Number);
-  return parts[0] + (parts[1]||0)/60;
+  if(typeof str==='number') return str*24;
+  const dateMatch=String(str).match(/Date\(\d+,\d+,\d+,(\d+),(\d+)/);
+  if(dateMatch) return parseInt(dateMatch[1])+parseInt(dateMatch[2])/60;
+  const parts=String(str).split(':').map(Number);
+  return parts[0]+(parts[1]||0)/60;
 }
 function buildLegs(ac,route,airports){
   const hubAp=airports[ac.homeBase];
@@ -310,32 +303,24 @@ function getConnectedIATAs(iata,routeMap,airports){
   const connected=new Set();
   const ap=Object.values(airports).find(a=>a.iata===iata);
   const isHub=ap&&Object.keys(HUB_TZ).includes(ap.icao);
-
   Object.values(routeMap).forEach(route=>{
     const dests=route.dests.split(',').map(s=>s.trim());
     if(isHub){
-      if(route.hub===iata){
-        dests.forEach(d=>connected.add(d));
-      }
-      if(dests.includes(iata)){
-        connected.add(route.hub);
-      }
+      if(route.hub===iata) dests.forEach(d=>connected.add(d));
+      if(dests.includes(iata)) connected.add(route.hub);
     } else {
-      if(dests.includes(iata)){
-        connected.add(route.hub);
-      }
+      if(dests.includes(iata)) connected.add(route.hub);
     }
   });
-
   connected.delete(iata);
   return connected;
 }
 </script>
-
+ 
 <script>
 const SHEET_ID='1Gn2t_5jhLf_gPHJN5ojSX270ImGtH2EYZi4HbwDgZJk';
 const SHEETS={fleet:'Fleet Information',airports:'Airport Information',routes:'Routes Master List',schedule:'Aircraft Schedule'};
-
+ 
 function sheetUrl(name){return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(name)}`;}
 function pad(n){return String(n).padStart(2,'0');}
 function formatTime(d){return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;}
@@ -345,7 +330,7 @@ function fmtHrs(h){
   return `${Math.floor(total)}:${pad(Math.round((total%1)*60))}`;
 }
 function hrsToUTC(localH,tzOffsetMin){return ((localH-tzOffsetMin/60)%24+24)%24;}
-
+ 
 function updateClocks(){
   const now=new Date();
   document.getElementById('clock-npt').textContent=formatTime(new Date(now.getTime()+345*60000));
@@ -354,7 +339,7 @@ function updateClocks(){
 }
 setInterval(updateClocks,1000);
 updateClocks();
-
+ 
 function toggleSidebar(){
   const sb=document.getElementById('sidebar');
   const btn=document.getElementById('sidebar-toggle');
@@ -369,10 +354,10 @@ function collapseSidebar(){
   btn.classList.add('collapsed');
   btn.innerHTML='&#9654;';
 }
-
+ 
 const map=L.map('map',{center:[27.5,87],zoom:5});
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
-
+ 
 async function fetchSheet(name){
   const resp=await fetch(sheetUrl(name));
   const text=await resp.text();
@@ -404,12 +389,10 @@ function statusLabel(s){
   return s;
 }
 function planeIcon(heading){
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform:rotate(${heading||0}deg);display:block;">
-    <path fill="#269473" d="M21,16L13,12V5.5A1.5,1.5,0,0,0,10,5.5V12L2,16V18L10,15.5V20L8,21.5V23L12,22L16,23V21.5L14,20V15.5L22,18Z"/>
-  </svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform:rotate(${heading||0}deg);display:block;"><path fill="#269473" d="M21,16L13,12V5.5A1.5,1.5,0,0,0,10,5.5V12L2,16V18L10,15.5V20L8,21.5V23L12,22L16,23V21.5L14,20V15.5L22,18Z"/></svg>`;
   return L.divIcon({html:svg,className:'',iconSize:[24,24],iconAnchor:[12,12]});
 }
-
+ 
 let activeArcs=[];
 function clearArcs(){activeArcs.forEach(l=>map.removeLayer(l));activeArcs=[];}
 function drawFlightArc(leg,progress){
@@ -432,19 +415,19 @@ function drawNetworkArcs(ap,connectedIATAs,airports){
     activeArcs.push(l);
   });
 }
-
+ 
 function switchTab(tabId){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
   document.getElementById('tab-'+tabId).classList.add('active');
   document.getElementById('tabcontent-'+tabId).classList.add('active');
 }
-
+ 
 function closeInfoPanel(){
   document.getElementById('info-panel').classList.remove('open');
   clearArcs();
 }
-
+ 
 function openAircraftPanel(ac,pos,route,routeMap,airports){
   collapseSidebar();
   const panel=document.getElementById('info-panel');
@@ -465,16 +448,13 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
     return;
   }
   if(pos.status==='airborne'&&pos.leg) drawFlightArc(pos.leg,pos.legT);
-
   const now=new Date();
   const nowLocal=new Date(now.getTime()+tz*60000);
   const nowHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
-
   const allLegs=getLegsInWindow(ac,routeMap,airports,now,12,24);
   const pastLegs=allLegs.filter(l=>l.arrHrs<nowHrs).slice(-4);
   const futureAndCurrent=allLegs.filter(l=>l.arrHrs>=nowHrs).slice(0,10);
   const displayLegs=[...pastLegs,...futureAndCurrent];
-
   let statusHtml='';
   if(pos.status==='airborne'){
     const elapsed=nowHrs-pos.deptHrs;
@@ -496,23 +476,21 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
         <div class="panel-row"><span class="panel-label">On ground at</span><span class="panel-val">${loc}</span></div>
       </div>`;
   }
-
   const legsHtml=displayLegs.map(leg=>{
     const isPast=leg.arrHrs<nowHrs;
     const isLive=leg.deptHrs<=nowHrs&&leg.arrHrs>nowHrs;
     const timeStr=isPast?fmtHrs(leg.arrHrs):fmtHrs(leg.deptHrs);
-    const label=isPast?'Arrived':isLive?'Live — Arr':fmtHrs(leg.deptHrs);
+    const statusWord=isPast?'Arrived':isLive?'ETA':'ETD';
     return `<div class="leg-card${isLive?' live':''}">
       <div class="leg-card-route">
         <span class="leg-card-pair${isLive?' live':''}">${leg.fromIATA} → ${leg.toIATA}</span>
         <span class="leg-card-reg">${ac.reg}</span>
       </div>
       <div class="leg-card-status${isLive?' live-status':''}">
-        ${isPast?'Arrived':'isLive'?'ETA':'ETD'}<span class="status-time">${timeStr} LT</span>
+        ${statusWord}<span class="status-time">${timeStr} LT</span>
       </div>
     </div>`;
   }).join('');
-
   body.innerHTML=`
     <div class="panel-reg">${ac.reg}</div>
     <div class="panel-type">${ac.type}</div>
@@ -527,7 +505,7 @@ function openAircraftPanel(ac,pos,route,routeMap,airports){
       ${legsHtml||'<div style="color:#443355;font-size:12px;">No flights in window</div>'}
     </div>`;
 }
-
+ 
 function openAirportPanel(ap,aircraftData,routeMap,airports){
   collapseSidebar();
   clearArcs();
@@ -542,18 +520,15 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
   const apTZ=Object.entries(HUB_TZ).find(([icao])=>icao===ap.icao);
   const tzOff=apTZ?apTZ[1]:null;
   const localTimeStr=tzOff!==null?formatTime(new Date(now.getTime()+tzOff*60000))+' LT':'—';
-
   function legRow(item,type){
     const tz=HUB_TZ[item.ac.homeBase]||345;
     const nl=new Date(now.getTime()+tz*60000);
     const nowHrs=nl.getUTCHours()+nl.getUTCMinutes()/60+nl.getUTCSeconds()/3600;
     const isPast=item.leg.arrHrs<nowHrs;
     const isLive=item.leg.deptHrs<=nowHrs&&item.leg.arrHrs>nowHrs;
-    const timeVal=type==='arr'
-      ?(isPast?fmtHrs(item.leg.arrHrs):fmtHrs(item.leg.arrHrs))
-      :(isPast?fmtHrs(item.leg.deptHrs):fmtHrs(item.leg.deptHrs));
+    const timeVal=type==='arr'?fmtHrs(item.leg.arrHrs):fmtHrs(item.leg.deptHrs);
     const statusWord=type==='arr'
-      ?(isPast?'Arrived':isLive?'ETA':'ETA')
+      ?(isPast?'Arrived':isLive?'Live':'ETA')
       :(isPast?'Departed':isLive?'Live':'ETD');
     const clickAttr=isLive?`onclick="window._openAcFromAirport('${item.ac.reg}')" style="cursor:pointer;"`:''
     return `<div class="leg-card${isLive?' live':''}" ${clickAttr}>
@@ -566,7 +541,6 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
       </div>
     </div>`;
   }
-
   const depsHtml=deps.length?deps.map(i=>legRow(i,'dep')).join(''):'<div style="color:#443355;font-size:12px;">None in window</div>';
   const arrsHtml=arrs.length?arrs.map(i=>legRow(i,'arr')).join(''):'<div style="color:#443355;font-size:12px;">None in window</div>';
   const groundHtml=ground.length?ground.map(ac=>`
@@ -574,7 +548,6 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
       <div class="ac-ground-reg">${ac.reg}</div>
       <div class="ac-ground-type">${ac.type}</div>
     </div>`).join(''):'<div style="color:#443355;font-size:12px;">No aircraft on ground</div>';
-
   body.innerHTML=`
     <div class="panel-iata">${ap.iata}</div>
     <div class="panel-airport-name">${ap.name||''} · ${ap.icao}</div>
@@ -593,7 +566,7 @@ function openAirportPanel(ap,aircraftData,routeMap,airports){
     <div class="tab-content" id="tabcontent-arrs">${arrsHtml}</div>
     <div class="tab-content" id="tabcontent-ground">${groundHtml}</div>`;
 }
-
+ 
 let expandedReg=null;
 function expandCard(reg){
   if(expandedReg&&expandedReg!==reg){
@@ -631,32 +604,50 @@ function expandCard(reg){
       <div class="info-row"><span class="info-label">Home base</span><span class="info-val">${ac.homeBase}</span></div>`;
   }
 }
-
+ 
+function addOrUpdateMarker(ac,pos,route,routeMap,airports,planeMarkers){
+  if(pos.status==='airborne'){
+    if(planeMarkers[ac.reg]){
+      planeMarkers[ac.reg].marker.setLatLng([pos.lat,pos.lon]);
+      planeMarkers[ac.reg].marker.setIcon(planeIcon(pos.heading));
+      planeMarkers[ac.reg].route=route;
+    } else {
+      const marker=L.marker([pos.lat,pos.lon],{icon:planeIcon(pos.heading)}).addTo(map);
+      marker.bindTooltip(ac.reg,{permanent:false,direction:'top',className:'leaflet-tooltip'});
+      marker.on('click',()=>openAircraftPanel(ac,window.posCache[ac.reg],route,routeMap,airports));
+      planeMarkers[ac.reg]={marker,ac,route};
+    }
+  } else if(planeMarkers[ac.reg]){
+    map.removeLayer(planeMarkers[ac.reg].marker);
+    delete planeMarkers[ac.reg];
+  }
+}
+ 
 async function init(){
   try{
     console.log('Init started');
     document.getElementById('loading-msg').textContent='Loading fleet...';
     const fleetRaw=tableToObjects(await fetchSheet(SHEETS.fleet));
     const fleet=fleetRaw.filter(r=>r['Fleet Information Aircraft Type']&&r['Registration']);
-
+ 
     document.getElementById('loading-msg').textContent='Loading routes...';
     const routesRaw=tableToObjects(await fetchSheet(SHEETS.routes)).filter(r=>r['Route Master List No.']&&r['Route']);
-    console.log('Route columns:', Object.keys(routesRaw[0]));
-    console.log('First route startTime raw:', routesRaw[0]['Start Time (LT)']);
     const routeMap={};
     routesRaw.forEach(r=>{routeMap[r['Route Master List No.']]={id:r['Route Master List No.'],hub:r['Hub'],dests:r['Route'],startTime:r['Start Time (LT)']?parseTime(r['Start Time (LT)']):6.0};});
-
+ 
     document.getElementById('loading-msg').textContent='Loading schedule...';
     const scheduleRaw=tableToObjects(await fetchSheet(SHEETS.schedule)).filter(r=>r['Aircraft']&&r['Aircraft Schedule Aircraft Type']);
-
+ 
+    // Build active IATA from ALL routes so destination airports are always included
     const activeIATA=new Set();
+    Object.values(routeMap).forEach(route=>{
+      activeIATA.add(route.hub);
+      route.dests.split(',').map(s=>s.trim()).forEach(d=>activeIATA.add(d));
+    });
     scheduleRaw.forEach(row=>{
-      ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day=>{
-        if(row[day]) row[day].split(',').map(s=>s.trim()).forEach(d=>activeIATA.add(d));
-      });
       if(row['Homebase']) activeIATA.add(row['Homebase']);
     });
-
+ 
     document.getElementById('loading-msg').textContent='Loading airports...';
     const airportsRaw=tableToObjects(await fetchSheet(SHEETS.airports)).filter(r=>r['Airport Information IATA']&&r['Lat.']&&r['Lon.']);
     const airportsByICAO={};
@@ -667,16 +658,13 @@ async function init(){
       airportsByICAO[icao]=obj;
       const isHub=Object.keys(HUB_TZ).includes(icao);
       const marker=L.circleMarker([obj.lat,obj.lon],{
-        radius:      isHub ? 9 : 5,
-        fillColor:   isHub ? '#5c158a' : '#BFA2DC',
-        color:       isHub ? '#c7c9d3' : '#5c158a',
-        weight:      isHub ? 2 : 1.5,
-        fillOpacity: isHub ? 1 : 0.85,
+        radius:isHub?9:5,fillColor:isHub?'#5c158a':'#BFA2DC',
+        color:isHub?'#c7c9d3':'#5c158a',weight:isHub?2:1.5,fillOpacity:isHub?1:0.85,
       }).addTo(map);
       marker.bindTooltip(`<b>${iata}</b> / ${icao}`,{className:'leaflet-tooltip',permanent:false,direction:'top'});
       marker.on('click',()=>openAirportPanel(obj,window._aircraftData,routeMap,airportsByICAO));
     });
-
+ 
     const aircraftData=[];
     scheduleRaw.forEach(row=>{
       const reg=row['Aircraft'];
@@ -690,20 +678,20 @@ async function init(){
         routeNums:['M','Tu','W','Th','F','Sa','Su'].map(d=>row[d]),
       });
     });
-
+ 
     const typeGroups={};
     aircraftData.forEach(ac=>{
       if(!typeGroups[ac.type]) typeGroups[ac.type]=[];
       typeGroups[ac.type].push(ac);
     });
-
+ 
     const listEl=document.getElementById('fleet-list');
     listEl.innerHTML='';
     document.getElementById('fleet-count').textContent=`${fleet.length} aircraft`;
-
+ 
     const planeMarkers={};
     const posCache={};
-
+ 
     aircraftData.forEach(ac=>{
       if(!ac.homeBase) return;
       const hubAp=airportsByICAO[ac.homeBase];
@@ -714,25 +702,16 @@ async function init(){
       const route=routeNum?routeMap[routeNum]:null;
       const pos=route&&hubAp?computePosition(ac,route,airportsByICAO,now):{status:'ground',lat:hubAp?.lat||null,lon:hubAp?.lon||null};
       posCache[ac.reg]=pos;
-      console.log(ac.reg, 'routeNum:', routeNum, 'startTime:', route?.startTime, 'pos:', pos.status, 'localHrs:', new Date(new Date().getTime()+(HUB_TZ[ac.homeBase]||345)*60000).getUTCHours());
-      if(pos.status==='airborne'){
-        const marker=L.marker([pos.lat,pos.lon],{icon:planeIcon(pos.heading)}).addTo(map);
-        marker.bindTooltip(ac.reg,{permanent:false,direction:'top',className:'leaflet-tooltip'});
-        marker.on('click',()=>openAircraftPanel(ac,pos,route,routeMap,airportsByICAO));
-        planeMarkers[ac.reg]={marker,ac,route};
-      }
+      addOrUpdateMarker(ac,pos,route,routeMap,airportsByICAO,planeMarkers);
     });
-
+ 
     Object.entries(typeGroups).forEach(([type,acs])=>{
       const groupDiv=document.createElement('div');
       groupDiv.className='type-group';
       groupDiv.innerHTML=`
         <div class="type-group-header" onclick="this.parentElement.classList.toggle('open')">
           <span>${type}</span>
-          <span>
-            <span class="type-count">${acs.length}</span>
-            <span class="type-chevron" style="margin-left:6px;">▶</span>
-          </span>
+          <span><span class="type-count">${acs.length}</span><span class="type-chevron" style="margin-left:6px;">▶</span></span>
         </div>
         <div class="type-group-body"></div>`;
       const groupBody=groupDiv.querySelector('.type-group-body');
@@ -753,41 +732,41 @@ async function init(){
       });
       listEl.appendChild(groupDiv);
     });
-
+ 
     window.posCache=posCache;
     window.aircraftDataMap=Object.fromEntries(aircraftData.map(a=>[a.reg,a]));
     window._routeMap=routeMap;
     window._airportsByICAO=airportsByICAO;
     window._aircraftData=aircraftData;
-
-    // Allow clicking live flights in airport panel to open aircraft panel
+ 
     window._openAcFromAirport=(reg)=>{
       const ac=window.aircraftDataMap[reg];
       const pos=window.posCache[reg];
-      const jsDow=new Date().getUTCDay();
+      const now=new Date();
+      const jsDow=new Date(now.getTime()+(HUB_TZ[ac.homeBase]||345)*60000).getUTCDay();
       const sheetDow=jsDow===0?6:jsDow-1;
       const routeNum=ac.routeNums[sheetDow];
       const route=routeNum?routeMap[routeNum]:null;
       if(ac&&pos&&route) openAircraftPanel(ac,pos,route,routeMap,airportsByICAO);
     };
-
+ 
     setInterval(()=>{
       const now=new Date();
-      Object.values(planeMarkers).forEach(({marker,ac,route})=>{
-        if(!route) return;
+      aircraftData.forEach(ac=>{
+        if(!ac.homeBase) return;
         const hubAp=airportsByICAO[ac.homeBase];
         if(!hubAp) return;
+        const jsDow=new Date(now.getTime()+(HUB_TZ[ac.homeBase]||345)*60000).getUTCDay();
+        const sheetDow=jsDow===0?6:jsDow-1;
+        const routeNum=ac.routeNums[sheetDow];
+        const route=routeNum?routeMap[routeNum]:null;
+        if(!route) return;
         const pos=computePosition(ac,route,airportsByICAO,now);
         posCache[ac.reg]=pos;
-        if(pos.status==='airborne'){
-          marker.setLatLng([pos.lat,pos.lon]);
-          marker.setIcon(planeIcon(pos.heading));
-        } else {
-          map.removeLayer(marker);
-        }
+        addOrUpdateMarker(ac,pos,route,routeMap,airportsByICAO,planeMarkers);
       });
     },30000);
-
+ 
     document.getElementById('loading').style.display='none';
     console.log('Done');
   }catch(err){
@@ -795,7 +774,7 @@ async function init(){
     document.getElementById('loading-msg').textContent='Error: '+err.message;
   }
 }
-
+ 
 init();
 </script>
 </body>
