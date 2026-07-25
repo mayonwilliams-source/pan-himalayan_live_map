@@ -231,15 +231,49 @@ function computePosition(ac,route,airports,nowUTC){
   const nowLocal=new Date(nowUTC.getTime()+tzOffset*60000);
   const localHrs=nowLocal.getUTCHours()+nowLocal.getUTCMinutes()/60+nowLocal.getUTCSeconds()/3600;
   const jsDow=nowLocal.getUTCDay();
-  const sheetDow=jsDow===0?6:jsDow-1;
-  const destStr=ac.schedule[sheetDow];
-  if(!destStr) return {status:'ground',lat:null,lon:null,hubICAO};
   const hubAp=airports[hubICAO];
   if(!hubAp) return {status:'ground',lat:null,lon:null,hubICAO};
-  const legs=buildLegs(ac,route,airports);
+  
+  const localHrsInYesterdayFrame = localHrs + 24;
+
+  // First check yesterday's route
+  const yesterdayRawDow=(jsDow-1+7)%7;
+  const yesterdaySd=yesterdayRawDow===0?6:yesterdayRawDow-1;
+  const yesterdayRouteNum=ac.routeNums[yesterdaySd];
+  const yesterdayRoute=yesterdayRouteNum?(window._routeMap?.[yesterdayRouteNum]||route):null;
+
+  if(yesterdayRoute){
+    const legs=buildLegs(ac,yesterdayRoute,airports);
+    const startHrs=yesterdayRoute.startTime!==null?yesterdayRoute.startTime:6.0;
+    if(localHrsInYesterdayFrame>=startHrs){
+      for(let i=0;i<legs.length;i++){
+        const leg=legs[i];
+        if(localHrsInYesterdayFrame>=leg.deptHrs&&localHrsInYesterdayFrame<leg.arrHrs){
+          const t=(localHrsInYesterdayFrame-leg.deptHrs)/(leg.arrHrs-leg.deptHrs);
+          const pos=greatCircleInterp(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon,t);
+          // Express dept/arr in today's frame (subtract 24)
+          return {status:'airborne',lat:pos.lat,lon:pos.lon,heading:bearing(leg.fromLat,leg.fromLon,leg.toLat,leg.toLon),fromIATA:leg.fromIATA,toIATA:leg.toIATA,deptHrs:leg.deptHrs-24,arrHrs:leg.arrHrs-24,legT:t,leg,hubICAO};
+        }
+        if(i<legs.length-1&&localHrsInYesterdayFrame>=leg.arrHrs&&localHrsInYesterdayFrame<legs[i+1].deptHrs){
+          return {status:'ground',lat:leg.toLat,lon:leg.toLon,atIATA:leg.toIATA,hubICAO};
+        }
+      }
+      if(localHrsInYesterdayFrame<legs[legs.length-1].arrHrs){
+        return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO,hubIATA:hubAp.iata};
+      }
+    }
+  }
+
+  const todaySd=jsDow===0?6:jsDow-1;
+  const todayRouteNum=ac.routeNums[todaySd];
+  const todayRoute=todayRouteNum?(window._routeMap?.[todayRouteNum]||route):null;
+  if(!todayRoute) return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO,hubIATA:hubAp.iata};
+
+  const legs=buildLegs(ac,todayRoute,airports);
   if(!legs.length) return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO};
-  const startHrs=route.startTime!==null?route.startTime:6.0;
+  const startHrs=todayRoute.startTime!==null?todayRoute.startTime:6.0;
   if(localHrs<startHrs) return {status:'ground',lat:hubAp.lat,lon:hubAp.lon,hubICAO,hubIATA:hubAp.iata};
+
   for(let i=0;i<legs.length;i++){
     const leg=legs[i];
     if(localHrs>=leg.deptHrs&&localHrs<leg.arrHrs){
