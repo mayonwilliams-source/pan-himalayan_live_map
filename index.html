@@ -205,6 +205,7 @@ function parseDuration(str){
   return parts[0]+(parts[1]||0)/60+(parts[2]||0)/3600;
 }
 function parseTime(str){
+  console.log('parseTime called with:', str, typeof str);
   if(!str) return 6;
   if(typeof str === 'number') return str * 24;
   const parts=String(str).split(':').map(Number);
