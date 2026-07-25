@@ -425,9 +425,35 @@ function statusLabel(s){
   if(l.includes('waiting'))               return 'Waiting';
   return s;
 }
-function planeIcon(heading){
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="transform:rotate(${heading||0}deg);display:block;"><path fill="#269473" d="M21,16L13,12V5.5A1.5,1.5,0,0,0,10,5.5V12L2,16V18L10,15.5V20L8,21.5V23L12,22L16,23V21.5L14,20V15.5L22,18Z"/></svg>`;
-  return L.divIcon({html:svg,className:'',iconSize:[24,24],iconAnchor:[12,12]});
+function planeIcon(heading, type){
+  let path;
+  if(type&&(type.toLowerCase().includes('atr')||type.toLowerCase().includes('at46'))){
+    // ATR 42-600 — shorter, straighter wings, turboprops
+    path=`<path fill="#269473" d="
+      M12,2 L13.2,4 L13.5,10 L19,8.5 L19.5,10 L13.8,12
+      L14,17 L16,18 L16,19.5 L12,18.5 L8,19.5 L8,18 L10,17
+      L10.2,12 L6.5,10 L7,8.5 L12.5,10 L12.8,4 Z
+      M9,9 L7.5,9.5 L7.5,10.5 L9.2,10 Z
+      M15,9 L16.5,9.5 L16.5,10.5 L14.8,10 Z
+    "/>`;
+  } else if(type&&type.toLowerCase().includes('a319')){
+    // A319neo — narrowbody, slightly shorter fuselage than A320
+    path=`<path fill="#269473" d="
+      M12,1.5 L13,3.5 L13.3,9.5 L21,7 L21.5,9 L13.6,12
+      L13.8,19 L15.5,20.5 L15.5,22 L12,21 L8.5,22 L8.5,20.5
+      L10.2,19 L10.4,12 L2.5,9 L3,7 L10.7,9.5 L11,3.5 Z
+    "/>`;
+  } else {
+    // A320neo — narrowbody, longer tail section
+    path=`<path fill="#269473" d="
+      M12,1 L13,3 L13.3,9.5 L21,7 L21.5,9 L13.6,12
+      L13.9,20 L15.5,21.5 L15.5,23 L12,22 L8.5,23 L8.5,21.5
+      L10.1,20 L10.4,12 L2.5,9 L3,7 L10.7,9.5 L11,3 Z
+    "/>`;
+  }
+
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" style="transform:rotate(${heading||0}deg);display:block;">${path}</svg>`;
+  return L.divIcon({html:svg,className:'',iconSize:[28,28],iconAnchor:[14,14]});
 }
 
 let activeArcs=[];
@@ -646,10 +672,10 @@ function addOrUpdateMarker(ac,pos,route,routeMap,airports,planeMarkers){
   if(pos.status==='airborne'){
     if(planeMarkers[ac.reg]){
       planeMarkers[ac.reg].marker.setLatLng([pos.lat,pos.lon]);
-      planeMarkers[ac.reg].marker.setIcon(planeIcon(pos.heading));
+      planeMarkers[ac.reg].marker.setIcon(planeIcon(pos.heading,ac.type));
       planeMarkers[ac.reg].route=route;
     } else {
-      const marker=L.marker([pos.lat,pos.lon],{icon:planeIcon(pos.heading)}).addTo(map);
+      const marker=L.marker([pos.lat,pos.lon],{icon:planeIcon(pos.heading,ac.type)}).addTo(map);
       marker.bindTooltip(ac.reg,{permanent:false,direction:'top',className:'leaflet-tooltip'});
       marker.on('click',()=>openAircraftPanel(ac,window.posCache[ac.reg],route,routeMap,airports));
       planeMarkers[ac.reg]={marker,ac,route};
